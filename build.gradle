@@ -18,9 +18,28 @@ repositories {
 }
 
 dependencies {
-    implementation 'org.springframework.boot:spring-boot-starter'
+    implementation 'org.springframework.boot:spring-boot-starter-web' // 웹 서비스
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa' // JPA로 간단하게 구현
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-client' // OAuth2 인증 및 OpenID Connect를 위한 라이브러리
+    implementation "org.springframework.boot:spring-boot-starter-security" // 전체적인 인증 및 인가 구현을 편리하게 하기 위함
+
+    runtimeOnly 'com.h2database:h2' // 로컬 테스트 환경으로 일단 h2
+    // runtimeOnly 'mysql:mysql-connector-j' // 이후 mysql로 변경.
+
+    // 보일러플레이트 코드를 줄이기 위한 라이브러리
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+
+    // 테스트 JUnit5
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    // testImplementation 'org.mockito:mockito-core:4.8.0 // Mockito가 필요할지 아직 모르겠음.
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+    // JWT를 위한 dependency
+    implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
+    implementation 'io.jsonwebtoken:jjwt-impl:0.11.5'
+    implementation 'io.jsonwebtoken:jjwt-jackson:0.11.5'
+
 }
 
 tasks.named('test') {
