@@ -7,7 +7,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.ss6051.backendspring.dto.KakaoAccessTokenDto;
 import com.ss6051.backendspring.dto.KakaoAccountTokenDto;
 import com.ss6051.backendspring.dto.LoginResponseDto;
-import com.ss6051.backendspring.entity.Account;
+import com.ss6051.backendspring.domain.Account;
 import com.ss6051.backendspring.repository.AccountRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;

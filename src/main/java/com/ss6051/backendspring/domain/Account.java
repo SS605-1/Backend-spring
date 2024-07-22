@@ -1,4 +1,4 @@
-package com.ss6051.backendspring.entity;
+package com.ss6051.backendspring.domain;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
