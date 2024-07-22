@@ -35,3 +35,5 @@ out/
 
 ### VS Code ###
 .vscode/
+
+/src/main/java/com/ss6051/backendspring/Secret.java
