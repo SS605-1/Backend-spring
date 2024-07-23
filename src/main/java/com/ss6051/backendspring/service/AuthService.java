@@ -95,8 +95,10 @@ public class AuthService {
     /**
      * 권한 변경
      * @param id db에 반영되어 있는 사용자 id 값
-     * @param role 권한 레벨: BOSS, EMPLOYEE
-     * @return ResponseEntity<LoginResponseDto> 권한 레벨이 변경된 사용자 정보를 담은 ResponseEntity. 실패 시 빈 ResponseEntity
+     * @param role 권한 레벨: BOSS, MANAGER, EMPLOYEE
+     * @return {@code ResponseEntity<LoginResponseDto>} 권한 레벨이 변경된 사용자 정보를 담은 ResponseEntity. 실패 시 빈 ResponseEntity
+     *
+     * @see com.ss6051.backendspring.domain.Role
      */
     public ResponseEntity<LoginResponseDto> updateRole(Long id, String role) {
         Account account = accountRepository.findById(id).orElse(null);
@@ -111,7 +113,7 @@ public class AuthService {
     /**
      * 카카오 서버에 액세스 토큰으로 사용자 정보 요청
      * @param kakaoAccessToken 카카오 액세스 토큰 값
-     * @return Account 생성했거나 DB에 저장된 Account 객체
+     * @return {@code Account} 생성했거나 DB에 저장된 Account 객체
      */
     private Account getKakaoInfo(String kakaoAccessToken) {
         // 카카오 서버에 토큰으로 사용자 정보 요청
@@ -152,7 +154,7 @@ public class AuthService {
     /**
      * 카카오 서버에 인가 코드로 토큰 요청을 위한 HttpEntity 생성
      * @param code FE에서 받아온 인가 코드
-     * @return HttpEntity<MultiValueMap<String, String>> Http 요청을 위한 HttpEntity
+     * @return {@code HttpEntity<MultiValueMap<String, String>>} Http 요청을 위한 HttpEntity
      */
     private static HttpEntity<MultiValueMap<String, String>> createKakaoAuthorizeRequestToken(String code) {
         HttpHeaders headers = new HttpHeaders();
@@ -172,7 +174,7 @@ public class AuthService {
     /**
      * 카카오 서버에 액세스 토큰으로 사용자 정보 요청을 위한 HttpEntity 생성
      * @param kakaoAccessToken 카카오 액세스 토큰 값
-     * @return HttpEntity<MultiValueMap<String, String>> Http 요청을 위한 HttpEntity
+     * @return {@code HttpEntity<MultiValueMap<String, String>>} Http 요청을 위한 HttpEntity
      */
     private static HttpEntity<MultiValueMap<String, String>> createKakaoAccountInfoRequestToken(String kakaoAccessToken) {
         // https://developers.kakao.com/docs/latest/ko/kakaologin/rest-api#req-user-info-request-header

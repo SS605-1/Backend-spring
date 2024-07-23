@@ -21,7 +21,7 @@ public class LoginController {
     /**
      * 카카오 로그인
      * @param request HttpServletRequest
-     * @return ResponseEntity<LoginResponseDto> 카카오 로그인 성공 시 사용자 정보를 담은 ResponseEntity. 실패 시 빈 ResponseEntity
+     * @return {@code ResponseEntity<LoginResponseDto>} 카카오 로그인 성공 시 사용자 정보를 담은 ResponseEntity. 실패 시 빈 ResponseEntity
      */
     @PostMapping("/")
     public ResponseEntity<LoginResponseDto> kakaoLogin(HttpServletRequest request) {
@@ -37,7 +37,7 @@ public class LoginController {
      * 권한 설정
      * @param id db에 반영되어 있는 사용자 id 값
      * @param role 권한 레벨: BOSS, EMPLOYEE
-     * @return ResponseEntity<LoginResponseDto> 권한 레벨이 변경된 사용자 정보를 담은 ResponseEntity. 실패 시 빈 ResponseEntity
+     * @return {@code ResponseEntity<LoginResponseDto>} 권한 레벨이 변경된 사용자 정보를 담은 ResponseEntity. 실패 시 빈 ResponseEntity
      */
     @PostMapping("/setRole")
     public ResponseEntity<LoginResponseDto> setRole(@RequestParam("id") Long id, @RequestParam("role") String role) {
