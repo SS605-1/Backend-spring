@@ -132,7 +132,7 @@ public class AuthService {
 
         assert kakaoAccountTokenDto != null;
         Long kakaoId = kakaoAccountTokenDto.getId();
-        Optional<Account> existAccount = accountRepository.findById(kakaoId);
+        Optional<Account> existAccount = findAccount(kakaoId);
         if (existAccount.isEmpty()) {
             // 새로 가입하는 회원인 경우, Account 객체를 생성하여 반환
             KakaoAccountTokenDto.KakaoAccount.Profile profile = kakaoAccountTokenDto.getKakaoAccount().getProfile();
@@ -149,6 +149,15 @@ public class AuthService {
             return existAccount.get();
         }
 
+    }
+
+    /**
+     * Account 객체를 ID로 조회
+     * @param kakaoId 카카오 ID
+     * @return {@code Optional<Account>} Account 객체
+     */
+    public Optional<Account> findAccount(Long kakaoId) {
+        return accountRepository.findById(kakaoId);
     }
 
     /**
