@@ -43,7 +43,7 @@ public class Store {
      */
     public List<Account> getManageableAccounts() {
         return getStoreAccountStream()
-                .filter(storeAccount -> storeAccount.getRole().ordinal() <= Role.MANAGER.ordinal()) // BOSS, MANAGER
+                .filter(storeAccount -> storeAccount.getRole().ordinal() <= Role.MANAGER.ordinal()) // OWNER, MANAGER
                 .map(StoreAccount::getAccount).toList();
 
     }

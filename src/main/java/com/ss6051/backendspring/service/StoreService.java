@@ -141,7 +141,7 @@ public class StoreService {
      *
      * @param accountId      db에 반영되어 있는 사용자 id 값
      * @param storeId      db에 반영되어 있는 매장 id 값
-     * @param role    권한 레벨: BOSS, MANAGER, EMPLOYEE
+     * @param role    권한 레벨
      * @return {@code ResponseEntity<LoginResponseDto>} 권한 레벨이 변경된 사용자 정보를 담은 ResponseEntity. 실패 시 빈 ResponseEntity
      * @see com.ss6051.backendspring.domain.Role
      */
