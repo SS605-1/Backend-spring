@@ -31,6 +31,17 @@ public class Store {
     private Address address;
 
     /**
+     * 매장에 속한 모든 계정(사장, 관리자, 직원)을 조회한다.
+     * @return List<Account> 매장에 속한 모든 계정
+     */
+    public List<Account> getAllAccounts() {
+        List<Account> allAccounts = managerList;
+        allAccounts.add(boss);
+        allAccounts.addAll(employeeList);
+        return allAccounts;
+    }
+
+    /**
      * 매장에 속한 모든 관리자 계정(사장과 관리자 계정)을 조회한다.
      * @return List<Account> 매장에 속한 모든 관리자 계정
      */
@@ -38,5 +49,13 @@ public class Store {
         List<Account> manageableAccounts = managerList;
         manageableAccounts.add(boss);
         return manageableAccounts;
+    }
+
+    public void addEmployee(Account account) {
+        if (employeeList == null) {
+            employeeList = List.of(account);
+            return;
+        }
+        employeeList.add(account);
     }
 }

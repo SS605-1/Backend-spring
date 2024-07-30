@@ -2,6 +2,7 @@ package com.ss6051.backendspring.service;
 
 import com.ss6051.backendspring.domain.Account;
 import com.ss6051.backendspring.domain.Address;
+import com.ss6051.backendspring.domain.Role;
 import com.ss6051.backendspring.domain.Store;
 import com.ss6051.backendspring.dto.RegisterStoreDto;
 import com.ss6051.backendspring.repository.StoreRepository;
@@ -93,5 +94,46 @@ public class StoreService {
         String code = oneTimeCodeGenerator.generateUniqueCode(storeId);
 
         return ResponseEntity.ok().body(code);
+    }
+
+    /**
+     * 일회성 코드를 입력해 매장의 직원으로 등록한다.
+     * @param accountId 직원으로 등록할 계정 ID
+     * @param code 일회성 코드
+     * @return ResponseEntity<?> 매장 직원 등록 결과
+     */
+    public ResponseEntity<?> registerEmployee(long accountId, String code) {
+        Optional<Account> account = authService.findAccount(accountId);
+        // 회원 정보를 조회해 없는 회원이면 bad request
+        if (account.isEmpty()) {
+            log.info("직원 등록 중지됨 - 주어진 ID에 해당하는 계정을 찾지 못함: accountId={}", accountId);
+            return ResponseEntity.badRequest().body("회원 정보를 찾을 수 없음");
+        }
+
+        // 일회성 코드에 해당하는 매장 ID 조회 - 맞는 코드가 없으면 bad request
+        Long storeId = oneTimeCodeGenerator.getStoreIdWithCode(code);
+        if (storeId == null) {
+            log.info("직원 등록 중지됨 - 주어진 코드에 해당하는 매장 ID를 찾지 못함: code={}", code);
+            return ResponseEntity.badRequest().body("입력한 코드에 해당하는 매장 ID를 찾을 수 없음");
+        }
+
+        // 매장 정보가 없으면 bad request
+        Optional<Store> store = findStore(storeId);
+        if (store.isEmpty()) {
+            log.info("직원 등록 중지됨 - 주어진 ID에 해당하는 매장을 찾지 못함: storeId={}", storeId);
+            return ResponseEntity.badRequest().body("매장 정보를 찾을 수 없음");
+        }
+
+        // 이미 매장에 소속된 직원이면 bad request
+        if (store.get().getAllAccounts().contains(account.get())) {
+            log.info("직원 등록 중지됨 - 이미 매장에 소속된 직원: accountId={}, storeId={}", accountId, storeId);
+            return ResponseEntity.badRequest().body("이미 매장에 소속된 직원");
+        }
+
+        store.get().addEmployee(account.get());
+        account.get().setRole(Role.EMPLOYEE);
+        storeRepository.save(store.get());
+
+        return ResponseEntity.ok().build();
     }
 }

@@ -71,4 +71,25 @@ public class StoreController {
         log.info("generateCode() end");
         return ret;
     }
+
+    /**
+     * 일회성 코드를 입력해 매장의 직원으로 등록한다.
+     * @param code 일회성 코드
+     *             매장 ID는 쿠키의 accountId 값으로 조회한다.
+     * @return ResponseEntity<?> 매장 직원 등록 결과
+     */
+    @PostMapping("/registerEmployee")
+    public ResponseEntity<?> registerEmployee(@RequestParam("code") String code) {
+        log.info("registerEmployee() start");
+        // 쿠키의 accountId 값으로 매장 ID를 조회해야 하므로 파라미터로 쿠키의 회원 아이디 넘기기
+        long accountId;
+        try { // 올바른 accountId 값이 들어왔는지 확인
+            accountId = Long.parseLong(ThreadLocalCookieContext.getCookieValue());
+        } catch (NumberFormatException e) {
+            return ResponseEntity.badRequest().body("Invalid account ID");
+        }
+        ResponseEntity<?> ret = storeService.registerEmployee(accountId, code);
+        log.info("registerEmployee() end");
+        return ret;
+    }
 }
