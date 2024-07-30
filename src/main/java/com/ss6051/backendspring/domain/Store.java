@@ -30,4 +30,13 @@ public class Store {
     @Embedded
     private Address address;
 
+    /**
+     * 매장에 속한 모든 관리자 계정(사장과 관리자 계정)을 조회한다.
+     * @return List<Account> 매장에 속한 모든 관리자 계정
+     */
+    public List<Account> getManageableAccounts() {
+        List<Account> manageableAccounts = managerList;
+        manageableAccounts.add(boss);
+        return manageableAccounts;
+    }
 }

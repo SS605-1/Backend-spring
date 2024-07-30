@@ -51,4 +51,24 @@ public class StoreController {
         log.info("findStore() end");
         return ret;
     }
+
+    /**
+     * 일회성 코드를 생성한다.
+     * @param storeId 일회성 코드를 생성할 매장의 ID 번호
+     * @return ResponseEntity<?> 일회성 코드 생성 결과
+     */
+    @PostMapping("/generateCode")
+    public ResponseEntity<?> generateCode(@RequestParam("storeId") long storeId){
+        log.info("generateCode() start");
+        // 쿠키의 accountId 값으로 매장 ID를 조회해야 하므로 파라미터로 쿠키의 회원 아이디 넘기기
+        long accountId;
+        try { // 올바른 accountId 값이 들어왔는지 확인
+            accountId = Long.parseLong(ThreadLocalCookieContext.getCookieValue());
+        } catch (NumberFormatException e) {
+            return ResponseEntity.badRequest().body("Invalid account ID");
+        }
+        ResponseEntity<?> ret = storeService.generateCode(accountId, storeId);
+        log.info("generateCode() end");
+        return ret;
+    }
 }
