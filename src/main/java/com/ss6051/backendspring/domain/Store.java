@@ -43,7 +43,7 @@ public class Store {
      */
     public List<Account> getManageableAccounts() {
         return getStoreAccountStream()
-                .filter(storeAccount -> storeAccount.getRole().ordinal() <= Role.MANAGER.ordinal()) // OWNER, MANAGER
+                .filter(storeAccount -> storeAccount.getRole().isManageable()) // Manager 권한 이상
                 .map(StoreAccount::getAccount).toList();
 
     }
