@@ -92,4 +92,26 @@ public class StoreController {
         log.info("registerEmployee() end");
         return ret;
     }
+
+    /**
+     * 권한 설정
+     * @param storeId 매장 ID
+     * @param role 권한 레벨: BOSS, MANAGER, EMPLOYEE
+     * @return {@code ResponseEntity<LoginResponseDto>} 권한 레벨이 변경된 사용자 정보를 담은 ResponseEntity. 실패 시 빈 ResponseEntity
+     */
+    @PostMapping("/setRole")
+    public ResponseEntity<?> setRole(@RequestParam("storeId") long storeId , @RequestParam("role") String role) {
+        log.info("setRole() start");
+
+        long accountId;
+        try { // 올바른 accountId 값이 들어왔는지 확인
+            accountId = Long.parseLong(ThreadLocalCookieContext.getCookieValue());
+        } catch (NumberFormatException e) {
+            return ResponseEntity.badRequest().body("Invalid account ID");
+        }
+
+        ResponseEntity<?> ret = storeService.updateRole(accountId, storeId, role);
+        log.info("setRole() end: accountId={}, role={}", accountId, role);
+        return ret;
+    }
 }

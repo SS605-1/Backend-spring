@@ -1,10 +1,9 @@
 package com.ss6051.backendspring.domain;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.*;
+
+import java.util.List;
 
 @Entity
 @Getter
@@ -22,9 +21,10 @@ public class Account {
     private String profile_image_url;
     private String thumbnail_image_url;
 
-    // Service
-    @Enumerated(EnumType.STRING)
-    @Setter
-    private Role role;
+    @ManyToMany(mappedBy = "managerList")
+    private List<Store> managedStores; // 관리하는 매장 목록
+
+    @ManyToMany(mappedBy = "employeeList")
+    private List<Store> employedStores; // 직원으로 근무하는 매장 목록
 
 }

@@ -1,10 +1,9 @@
 package com.ss6051.backendspring.service;
 
-import com.ss6051.backendspring.domain.Account;
-import com.ss6051.backendspring.domain.Address;
-import com.ss6051.backendspring.domain.Role;
-import com.ss6051.backendspring.domain.Store;
+
+import com.ss6051.backendspring.domain.*;
 import com.ss6051.backendspring.dto.RegisterStoreDto;
+import com.ss6051.backendspring.repository.StoreAccountRepository;
 import com.ss6051.backendspring.repository.StoreRepository;
 import com.ss6051.backendspring.tool.OneTimeCodeGenerator;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +20,7 @@ public class StoreService {
 
     private final AuthService authService;
     private final StoreRepository storeRepository;
+    private final StoreAccountRepository storeAccountRepository;
     private final OneTimeCodeGenerator oneTimeCodeGenerator;
 
 
@@ -85,7 +85,7 @@ public class StoreService {
         }
 
         // 매장에 소속된 관리 권한을 가진 유저가 아니면 bad request
-        if (!store.get().getManageableAccounts().contains(account.get())) {
+        if (store.get().isNotManageableAccount(account.get())) {
             log.info("일회성 코드 생성 중지됨 - 주어진 ID에 해당하는 계정이 매장의 관리자가 아님: accountId={}, storeId={}", accountId, storeId);
             return ResponseEntity.badRequest().body("해당 매장의 관리자가 아님");
         }
@@ -131,8 +131,46 @@ public class StoreService {
         }
 
         store.get().addEmployee(account.get());
-        account.get().setRole(Role.EMPLOYEE);
         storeRepository.save(store.get());
+
+        return ResponseEntity.ok().build();
+    }
+
+    /**
+     * 권한 변경
+     *
+     * @param accountId      db에 반영되어 있는 사용자 id 값
+     * @param storeId      db에 반영되어 있는 매장 id 값
+     * @param role    권한 레벨: BOSS, MANAGER, EMPLOYEE
+     * @return {@code ResponseEntity<LoginResponseDto>} 권한 레벨이 변경된 사용자 정보를 담은 ResponseEntity. 실패 시 빈 ResponseEntity
+     * @see com.ss6051.backendspring.domain.Role
+     */
+    public ResponseEntity<?> updateRole(Long accountId, long storeId, String role) {
+        Account account = authService.findAccount(accountId).orElse(null);
+        if (account == null) {
+            return ResponseEntity.badRequest().body("해당 ID에 해당하는 사용자를 찾을 수 없음");
+        }
+
+        Optional<Store> findStore = findStore(storeId);
+        if (findStore.isEmpty()) {
+            return ResponseEntity.badRequest().body("해당 ID에 해당하는 매장을 찾을 수 없음");
+        }
+
+        // 매장에 소속된 관리 권한을 가진 유저가 아니면 bad request
+        Store store = findStore.get();
+        if (store.isNotManageableAccount(account)) {
+            return ResponseEntity.badRequest().body("해당 매장의 관리자가 아님");
+        }
+
+        Optional<StoreAccount> byStoreIdAndAccountId = storeAccountRepository.findByStoreIdAndAccountId(storeId, accountId);
+        if (byStoreIdAndAccountId.isEmpty()) {
+            return ResponseEntity.badRequest().body("해당 매장에 소속되어 있지 않음");
+        }
+
+        StoreAccount storeAccount = byStoreIdAndAccountId.get();
+        storeAccount.setRole(Role.valueOf(role));
+        storeAccountRepository.save(storeAccount);
+        log.info("권한 변경: accountId={}, storeId={}, role={}", accountId, storeId, role);
 
         return ResponseEntity.ok().build();
     }

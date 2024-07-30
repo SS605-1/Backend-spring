@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.List;
+import java.util.stream.Stream;
 
 @Entity
 @Getter
@@ -21,11 +22,8 @@ public class Store {
     @OneToOne
     private Account boss; // 사장
 
-    @OneToMany
-    private List<Account> managerList; // 관리자
-
-    @OneToMany
-    private List<Account> employeeList; // 직원
+    @OneToMany(mappedBy = "store")
+    private List<StoreAccount> storeAccounts;
 
     @Embedded
     private Address address;
@@ -35,10 +33,8 @@ public class Store {
      * @return List<Account> 매장에 속한 모든 계정
      */
     public List<Account> getAllAccounts() {
-        List<Account> allAccounts = managerList;
-        allAccounts.add(boss);
-        allAccounts.addAll(employeeList);
-        return allAccounts;
+        return getStoreAccountStream()
+                .map(StoreAccount::getAccount).toList();
     }
 
     /**
@@ -46,16 +42,33 @@ public class Store {
      * @return List<Account> 매장에 속한 모든 관리자 계정
      */
     public List<Account> getManageableAccounts() {
-        List<Account> manageableAccounts = managerList;
-        manageableAccounts.add(boss);
-        return manageableAccounts;
+        return getStoreAccountStream()
+                .filter(storeAccount -> storeAccount.getRole().ordinal() <= Role.MANAGER.ordinal()) // BOSS, MANAGER
+                .map(StoreAccount::getAccount).toList();
+
     }
 
+    public boolean isNotManageableAccount(Account account) {
+        return !getManageableAccounts().contains(account);
+    }
+
+    /**
+     * 매장에 새 직원을 추가한다.
+     * @param account 직원으로 추가할 계정
+     */
     public void addEmployee(Account account) {
-        if (employeeList == null) {
-            employeeList = List.of(account);
-            return;
-        }
-        employeeList.add(account);
+        storeAccounts.add(StoreAccount.builder()
+                .store(this)
+                .account(account)
+                .role(Role.EMPLOYEE)
+                .build());
+    }
+
+    /**
+     * 해당 매장 소속 계정을 조회하는 스트림을 반환한다.
+     */
+    private Stream<StoreAccount> getStoreAccountStream() {
+        return storeAccounts.stream()
+                .filter(storeAccount -> storeAccount.getStore().getId().equals(this.id));
     }
 }

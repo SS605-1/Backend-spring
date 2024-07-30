@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.ss6051.backendspring.domain.Account;
-import com.ss6051.backendspring.domain.Role;
 import com.ss6051.backendspring.dto.KakaoAccessTokenDto;
 import com.ss6051.backendspring.dto.KakaoAccountTokenDto;
 import com.ss6051.backendspring.dto.LoginResponseDto;
@@ -92,23 +91,6 @@ public class AuthService {
         }
     }
 
-    /**
-     * 권한 변경
-     * @param id db에 반영되어 있는 사용자 id 값
-     * @param role 권한 레벨: BOSS, MANAGER, EMPLOYEE
-     * @return {@code ResponseEntity<LoginResponseDto>} 권한 레벨이 변경된 사용자 정보를 담은 ResponseEntity. 실패 시 빈 ResponseEntity
-     *
-     * @see com.ss6051.backendspring.domain.Role
-     */
-    public ResponseEntity<LoginResponseDto> updateRole(Long id, String role) {
-        Account account = accountRepository.findById(id).orElse(null);
-        if (account == null) {
-            return ResponseEntity.badRequest().body(new LoginResponseDto());
-        }
-        account.setRole(Role.valueOf(role));
-        accountRepository.save(account);
-        return ResponseEntity.ok().body(new LoginResponseDto());
-    }
 
     /**
      * 카카오 서버에 액세스 토큰으로 사용자 정보 요청
@@ -141,7 +123,6 @@ public class AuthService {
                     .profile_image_url(profile.getProfile_image_url())
                     .thumbnail_image_url(profile.getThumbnail_image_url())
                     .nickname(profile.getNickname())
-                    .role(Role.EMPLOYEE)
                     .build();
             log.info("신규 회원 생성: newAccount={}", newAccount);
             return newAccount;
