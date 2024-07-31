@@ -10,7 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@RestController("/api/oauth2/kakao")
+@RestController("/oauth2/kakao")
 @Slf4j
 @RequiredArgsConstructor
 public class LoginController {
@@ -22,7 +22,7 @@ public class LoginController {
      * @param request HttpServletRequest
      * @return {@code ResponseEntity<LoginResponseDto>} 카카오 로그인 성공 시 사용자 정보를 담은 ResponseEntity. 실패 시 빈 ResponseEntity
      */
-    @PostMapping("/")
+    @PostMapping("")
     public ResponseEntity<LoginResponseDto> kakaoLogin(HttpServletRequest request) {
         log.info("kakaoLogin() start");
         String code = request.getParameter("code");
