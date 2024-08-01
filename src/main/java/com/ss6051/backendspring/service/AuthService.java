@@ -36,39 +36,23 @@ public class AuthService {
     private final AccountRepository accountRepository;
 
     /**
-     * 카카오 서버에 인가 코드로 토큰 요청
-     * @param code FE에서 받아온 인가 코드
-     * @return KakaoAccessTokenDto
-     */
-    @Transactional
-    public KakaoAccessTokenDto getKakaoAccessToken(String code) {
-        // 카카오 서버에 인가 코드로 토큰 요청
-        HttpEntity<MultiValueMap<String, String>> kakaoTokenRequest = createKakaoAuthorizeRequestToken(code);
-
-        // 카카오 서버로부터 받은 토큰을 저장
-        ResponseEntity<String> accessTokenResponse = new RestTemplate().exchange(KAKAO_TOKEN_URI, HttpMethod.POST, kakaoTokenRequest, String.class);
-
-        // 받은 토큰을 KakaoTokenDto로 파싱
-        ObjectMapper objectMapper = getObjectMapper();
-
-        KakaoAccessTokenDto kakaoAccessTokenDto = null;
-        try {
-            kakaoAccessTokenDto = objectMapper.readValue(accessTokenResponse.getBody(), KakaoAccessTokenDto.class);
-        } catch (JsonProcessingException e) {
-            log.error("getKakaoAccessToken() error: code={}", code, e);
-        }
-
-        return kakaoAccessTokenDto;
-    }
-
-    /**
      * 카카오 사용자 정보 가져오기
-     * @param kakaoAccessToken 카카오 액세스 토큰 값
+     * @param code 카카오 액세스 토큰 값
      * @return ResponseEntity<LoginResponseDto> 로그인 응답 DTO를 담은 ResponseEntity
      */
     @Transactional
-    public ResponseEntity<LoginResponseDto> kakaoLogin(String kakaoAccessToken) {
-        Account account = getKakaoInfo(kakaoAccessToken);
+    public ResponseEntity<LoginResponseDto> kakaoLogin(String code) {
+        KakaoAccessTokenDto kakaoAccessToken = getKakaoAccessToken(code);
+        if (kakaoAccessToken == null) {
+            log.error("kakaoAccessToken is null: code={}", code);
+            return ResponseEntity.badRequest().build();
+        }
+
+        Account account = getKakaoInfo(kakaoAccessToken.getAccess_token());
+        if (account == null) {
+            log.error("account is null: code={}", code);
+            return ResponseEntity.badRequest().build();
+        }
 
         LoginResponseDto loginResponseDto = new LoginResponseDto();
         loginResponseDto.setLoginSuccessful(true);
@@ -87,6 +71,7 @@ public class AuthService {
 
         } catch (Exception e) {
             loginResponseDto.setLoginSuccessful(false);
+            log.error("회원 가입/로그인 실패: id={}, nickname={}", account.getId(), account.getNickname(), e);
             return ResponseEntity.badRequest().body(loginResponseDto);
         }
     }
@@ -105,11 +90,12 @@ public class AuthService {
         ResponseEntity<String> accountInfoResponse = new RestTemplate().exchange(KAKAO_USER_INFO_URI, HttpMethod.POST, kakaoAccountInfoRequest, String.class);
 
         ObjectMapper objectMapper = getObjectMapper();
-        KakaoAccountTokenDto kakaoAccountTokenDto = null;
+        KakaoAccountTokenDto kakaoAccountTokenDto;
         try {
             kakaoAccountTokenDto = objectMapper.readValue(accountInfoResponse.getBody(), KakaoAccountTokenDto.class);
         } catch (JsonProcessingException e) {
             log.error("getKakaoInfo() error: accessToken={}", kakaoAccessToken, e);
+            return null;
         }
 
         assert kakaoAccountTokenDto != null;
@@ -139,6 +125,31 @@ public class AuthService {
      */
     public Optional<Account> findAccount(Long kakaoId) {
         return accountRepository.findById(kakaoId);
+    }
+
+    /**
+     * 카카오 서버에 인가 코드로 토큰 요청
+     * @param code FE에서 받아온 인가 코드
+     * @return KakaoAccessTokenDto
+     */
+    private KakaoAccessTokenDto getKakaoAccessToken(String code) {
+        // 카카오 서버에 인가 코드로 토큰 요청
+        HttpEntity<MultiValueMap<String, String>> kakaoTokenRequest = createKakaoAuthorizeRequestToken(code);
+
+        // 카카오 서버로부터 받은 토큰을 저장
+        ResponseEntity<String> accessTokenResponse = new RestTemplate().exchange(KAKAO_TOKEN_URI, HttpMethod.POST, kakaoTokenRequest, String.class);
+
+        // 받은 토큰을 KakaoTokenDto로 파싱
+        ObjectMapper objectMapper = getObjectMapper();
+
+        KakaoAccessTokenDto kakaoAccessTokenDto = null;
+        try {
+            kakaoAccessTokenDto = objectMapper.readValue(accessTokenResponse.getBody(), KakaoAccessTokenDto.class);
+        } catch (JsonProcessingException e) {
+            log.error("getKakaoAccessToken() error: code={}", code, e);
+        }
+
+        return kakaoAccessTokenDto;
     }
 
     /**

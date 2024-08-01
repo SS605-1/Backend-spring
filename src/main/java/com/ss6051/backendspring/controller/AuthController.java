@@ -1,6 +1,5 @@
 package com.ss6051.backendspring.controller;
 
-import com.ss6051.backendspring.dto.KakaoAccessTokenDto;
 import com.ss6051.backendspring.dto.LoginResponseDto;
 import com.ss6051.backendspring.service.AuthService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -13,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController("/oauth2/kakao")
 @Slf4j
 @RequiredArgsConstructor
-public class LoginController {
+public class AuthController {
 
     private final AuthService authService;
 
@@ -26,8 +25,8 @@ public class LoginController {
     public ResponseEntity<LoginResponseDto> kakaoLogin(HttpServletRequest request) {
         log.info("kakaoLogin() start");
         String code = request.getParameter("code");
-        KakaoAccessTokenDto kakaoAccessToken = authService.getKakaoAccessToken(code);
-        ResponseEntity<LoginResponseDto> ret = authService.kakaoLogin(kakaoAccessToken.getAccess_token());
+
+        ResponseEntity<LoginResponseDto> ret = authService.kakaoLogin(code);
         log.info("kakaoLogin() end");
         return ret;
     }
