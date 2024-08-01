@@ -44,7 +44,7 @@ public class StoreService {
 
         // account 가 존재하면 매장 정보 등록
         Store newStore = Store.builder()
-                .boss(account.get())
+                .owner(account.get())
                 .name(registerStoreDto.getStore_name())
                 .address(new Address(registerStoreDto.street_address, registerStoreDto.lot_number_address))
                 .build();

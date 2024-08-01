@@ -21,10 +21,20 @@ public class Account {
     private String profile_image_url;
     private String thumbnail_image_url;
 
-    @ManyToMany(mappedBy = "managerList")
+    @ManyToMany
+    @JoinTable(
+            name = "store_manager",
+            joinColumns = @JoinColumn(name = "account_id"),
+            inverseJoinColumns = @JoinColumn(name = "store_id")
+    )
     private List<Store> managedStores; // 관리하는 매장 목록
 
-    @ManyToMany(mappedBy = "employeeList")
+    @ManyToMany
+    @JoinTable(
+            name = "store_employee",
+            joinColumns = @JoinColumn(name = "account_id"),
+            inverseJoinColumns = @JoinColumn(name = "store_id")
+    )
     private List<Store> employedStores; // 직원으로 근무하는 매장 목록
 
 }

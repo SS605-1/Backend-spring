@@ -20,10 +20,14 @@ public class Store {
     private String name;
 
     @OneToOne
-    private Account boss; // 사장
+    private Account owner; // 사장
 
     @OneToMany(mappedBy = "store")
-    private List<StoreAccount> storeAccounts;
+    private List<StoreAccount> managerList; // 직원 목록
+
+    @OneToMany(mappedBy = "store")
+    private List<StoreAccount> employeeList; // 직원 목록
+
 
     @Embedded
     private Address address;
@@ -57,7 +61,7 @@ public class Store {
      * @param account 직원으로 추가할 계정
      */
     public void addEmployee(Account account) {
-        storeAccounts.add(StoreAccount.builder()
+        employeeList.add(StoreAccount.builder()
                 .store(this)
                 .account(account)
                 .role(Role.EMPLOYEE)
@@ -68,7 +72,17 @@ public class Store {
      * 해당 매장 소속 계정을 조회하는 스트림을 반환한다.
      */
     private Stream<StoreAccount> getStoreAccountStream() {
-        return storeAccounts.stream()
-                .filter(storeAccount -> storeAccount.getStore().getId().equals(this.id));
+        // return owner + managerList + employeeList
+        return Stream.concat(
+                Stream.of(StoreAccount.builder()
+                        .store(this)
+                        .account(owner)
+                        .role(Role.OWNER)
+                        .build()),
+                Stream.concat(
+                        managerList.stream(),
+                        employeeList.stream()
+                )
+        );
     }
 }
