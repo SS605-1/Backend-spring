@@ -40,25 +40,17 @@ public class AuthService {
 
     /**
      * 카카오 사용자 정보 가져오기
+     *
      * @param code 카카오 액세스 토큰 값
-     * @return ResponseEntity<LoginResponseDto> 로그인 응답 DTO를 담은 ResponseEntity
+     * @return {@code LoginResponseDto} 사용자 정보
      */
-    // TODO: 모든 ResponseEntity 및 예외처리를 throw 처리하고 Controller 에서 처리하도록 변경
     @Transactional
-    public ResponseEntity<LoginResponseDto> kakaoLogin(String code) {
+    public LoginResponseDto kakaoLogin(String code) throws JsonProcessingException {
         // 1. 인가 코드 -> 액세스 토큰 요청
         KakaoAccessTokenDto kakaoAccessToken = getKakaoAccessToken(code);
 
-        if (kakaoAccessToken == null) {
-            log.error("kakaoAccessToken is null: code={}", code);
-            return ResponseEntity.badRequest().build();
-        }
-
         // 2. 액세스 토큰 -> 사용자 정보 요청
         KakaoAccountTokenDto kakaoAccountTokenDto = getKakaoInfo(kakaoAccessToken.getAccess_token());
-        if (kakaoAccountTokenDto == null) {
-            return ResponseEntity.badRequest().build();
-        }
 
         // 3. 사용자 정보로 회원가입 및 로그인 처리
         Long kakaoId = kakaoAccountTokenDto.getId();
@@ -72,11 +64,11 @@ public class AuthService {
                 .token(authtokens)
                 .build();
 
+        // 기존 회원 여부 검사; 회원 가입 처리
         Optional<Account> existAccount = findAccount(kakaoId);
         try {
+            // 신규 회원 가입 처리
             if (existAccount.isEmpty()) {
-                // 새로 가입하는 회원인 경우, Account 객체를 생성하여 반환
-
                 Account newAccount = Account.builder()
                         .id(loginResponseDto.getId())
                         .profile_image_url(loginResponseDto.getProfile_image_url())
@@ -88,10 +80,10 @@ public class AuthService {
 
             }
             log.info("회원 로그인: id={}, nickname={}", loginResponseDto.getId(), loginResponseDto.getNickname());
-            return ResponseEntity.ok(loginResponseDto);
+            return loginResponseDto;
         } catch (Exception e) {
             log.error("회원 가입/로그인 실패: id={}, nickname={}", loginResponseDto.getId(), loginResponseDto.getNickname(), e);
-            return ResponseEntity.badRequest().build();
+            throw e;
         }
     }
 
@@ -111,7 +103,7 @@ public class AuthService {
      * @param kakaoAccessToken 카카오 액세스 토큰 값
      * @return {@code KakaoAccountTokenDto} 사용자 정보
      */
-    private KakaoAccountTokenDto getKakaoInfo(String kakaoAccessToken) {
+    private KakaoAccountTokenDto getKakaoInfo(String kakaoAccessToken) throws JsonProcessingException {
         // 카카오 서버에 토큰으로 사용자 정보 요청
         HttpEntity<MultiValueMap<String, String>> kakaoAccountInfoRequest = createKakaoAccountInfoRequestToken(kakaoAccessToken);
 
@@ -125,7 +117,7 @@ public class AuthService {
             kakaoAccountTokenDto = objectMapper.readValue(accountInfoResponse.getBody(), KakaoAccountTokenDto.class);
         } catch (JsonProcessingException e) {
             log.error("getKakaoInfo() error: accessToken={}", kakaoAccessToken, e);
-            return null;
+            throw e;
         }
         return kakaoAccountTokenDto;
     }
@@ -135,7 +127,7 @@ public class AuthService {
      * @param code FE에서 받아온 인가 코드
      * @return KakaoAccessTokenDto
      */
-    private KakaoAccessTokenDto getKakaoAccessToken(String code) {
+    private KakaoAccessTokenDto getKakaoAccessToken(String code) throws JsonProcessingException {
         // 카카오 서버에 인가 코드로 토큰 요청
         HttpEntity<MultiValueMap<String, String>> kakaoTokenRequest = createKakaoAuthorizeRequestToken(code);
 
@@ -145,11 +137,12 @@ public class AuthService {
         // 받은 토큰을 KakaoTokenDto로 파싱
         ObjectMapper objectMapper = getObjectMapper();
 
-        KakaoAccessTokenDto kakaoAccessTokenDto = null;
+        KakaoAccessTokenDto kakaoAccessTokenDto;
         try {
             kakaoAccessTokenDto = objectMapper.readValue(accessTokenResponse.getBody(), KakaoAccessTokenDto.class);
         } catch (JsonProcessingException e) {
             log.error("getKakaoAccessToken() error: code={}", code, e);
+            throw e;
         }
 
         return kakaoAccessTokenDto;
