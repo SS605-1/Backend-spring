@@ -5,10 +5,12 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.ss6051.backendspring.domain.Account;
+import com.ss6051.backendspring.domain.AuthTokens;
 import com.ss6051.backendspring.dto.KakaoAccessTokenDto;
 import com.ss6051.backendspring.dto.KakaoAccountTokenDto;
 import com.ss6051.backendspring.dto.LoginResponseDto;
 import com.ss6051.backendspring.repository.AccountRepository;
+import com.ss6051.backendspring.tool.AuthTokensGenerator;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,89 +36,65 @@ import static com.ss6051.backendspring.Secret.*;
 public class AuthService {
 
     private final AccountRepository accountRepository;
+    private final AuthTokensGenerator authTokensGenerator;
 
     /**
      * 카카오 사용자 정보 가져오기
      * @param code 카카오 액세스 토큰 값
      * @return ResponseEntity<LoginResponseDto> 로그인 응답 DTO를 담은 ResponseEntity
      */
+    // TODO: 모든 ResponseEntity 및 예외처리를 throw 처리하고 Controller 에서 처리하도록 변경
     @Transactional
     public ResponseEntity<LoginResponseDto> kakaoLogin(String code) {
+        // 1. 인가 코드 -> 액세스 토큰 요청
         KakaoAccessTokenDto kakaoAccessToken = getKakaoAccessToken(code);
+
         if (kakaoAccessToken == null) {
             log.error("kakaoAccessToken is null: code={}", code);
             return ResponseEntity.badRequest().build();
         }
 
-        Account account = getKakaoInfo(kakaoAccessToken.getAccess_token());
-        if (account == null) {
-            log.error("account is null: code={}", code);
+        // 2. 액세스 토큰 -> 사용자 정보 요청
+        KakaoAccountTokenDto kakaoAccountTokenDto = getKakaoInfo(kakaoAccessToken.getAccess_token());
+        if (kakaoAccountTokenDto == null) {
             return ResponseEntity.badRequest().build();
         }
 
-        LoginResponseDto loginResponseDto = new LoginResponseDto();
-        loginResponseDto.setLoginSuccessful(true);
-        loginResponseDto.setAccount(account);
-
-        Account existOwner = accountRepository.findById(account.getId()).orElse(null);
-        try {
-            if (existOwner == null) {
-                log.info("신규 회원 가입처리: id={}, nickname={}", account.getId(), account.getNickname());
-                accountRepository.save(account);
-            }
-            loginResponseDto.setLoginSuccessful(true);
-
-            log.info("회원 로그인: id={}, nickname={}", account.getId(), account.getNickname());
-            return ResponseEntity.ok().body(loginResponseDto);
-
-        } catch (Exception e) {
-            loginResponseDto.setLoginSuccessful(false);
-            log.error("회원 가입/로그인 실패: id={}, nickname={}", account.getId(), account.getNickname(), e);
-            return ResponseEntity.badRequest().body(loginResponseDto);
-        }
-    }
-
-
-    /**
-     * 카카오 서버에 액세스 토큰으로 사용자 정보 요청
-     * @param kakaoAccessToken 카카오 액세스 토큰 값
-     * @return {@code Account} 생성했거나 DB에 저장된 Account 객체
-     */
-    private Account getKakaoInfo(String kakaoAccessToken) {
-        // 카카오 서버에 토큰으로 사용자 정보 요청
-        HttpEntity<MultiValueMap<String, String>> kakaoAccountInfoRequest = createKakaoAccountInfoRequestToken(kakaoAccessToken);
-
-        // 카카오 서버로부터 받은 사용자 정보를 저장
-        ResponseEntity<String> accountInfoResponse = new RestTemplate().exchange(KAKAO_USER_INFO_URI, HttpMethod.POST, kakaoAccountInfoRequest, String.class);
-
-        ObjectMapper objectMapper = getObjectMapper();
-        KakaoAccountTokenDto kakaoAccountTokenDto;
-        try {
-            kakaoAccountTokenDto = objectMapper.readValue(accountInfoResponse.getBody(), KakaoAccountTokenDto.class);
-        } catch (JsonProcessingException e) {
-            log.error("getKakaoInfo() error: accessToken={}", kakaoAccessToken, e);
-            return null;
-        }
-
-        assert kakaoAccountTokenDto != null;
+        // 3. 사용자 정보로 회원가입 및 로그인 처리
         Long kakaoId = kakaoAccountTokenDto.getId();
-        Optional<Account> existAccount = findAccount(kakaoId);
-        if (existAccount.isEmpty()) {
-            // 새로 가입하는 회원인 경우, Account 객체를 생성하여 반환
-            KakaoAccountTokenDto.KakaoAccount.Profile profile = kakaoAccountTokenDto.getKakaoAccount().getProfile();
-            Account newAccount = Account.builder()
-                    .id(kakaoId)
-                    .profile_image_url(profile.getProfile_image_url())
-                    .thumbnail_image_url(profile.getThumbnail_image_url())
-                    .nickname(profile.getNickname())
-                    .build();
-            log.info("신규 회원 생성: newAccount={}", newAccount);
-            return newAccount;
-        } else {
-            return existAccount.get();
-        }
+        AuthTokens authtokens = authTokensGenerator.generate(kakaoId.toString());
 
+        LoginResponseDto loginResponseDto = LoginResponseDto.builder()
+                .id(kakaoId)
+                .nickname(kakaoAccountTokenDto.getKakaoAccount().getProfile().getNickname())
+                .profile_image_url(kakaoAccountTokenDto.getKakaoAccount().getProfile().getProfile_image_url())
+                .thumbnail_image_url(kakaoAccountTokenDto.getKakaoAccount().getProfile().getThumbnail_image_url())
+                .token(authtokens)
+                .build();
+
+        Optional<Account> existAccount = findAccount(kakaoId);
+        try {
+            if (existAccount.isEmpty()) {
+                // 새로 가입하는 회원인 경우, Account 객체를 생성하여 반환
+
+                Account newAccount = Account.builder()
+                        .id(loginResponseDto.getId())
+                        .profile_image_url(loginResponseDto.getProfile_image_url())
+                        .thumbnail_image_url(loginResponseDto.getThumbnail_image_url())
+                        .nickname(loginResponseDto.getNickname())
+                        .build();
+                accountRepository.save(newAccount);
+                log.info("신규 회원 가입처리: id={}, nickname={}", newAccount.getId(), newAccount.getNickname());
+
+            }
+            log.info("회원 로그인: id={}, nickname={}", loginResponseDto.getId(), loginResponseDto.getNickname());
+            return ResponseEntity.ok(loginResponseDto);
+        } catch (Exception e) {
+            log.error("회원 가입/로그인 실패: id={}, nickname={}", loginResponseDto.getId(), loginResponseDto.getNickname(), e);
+            return ResponseEntity.badRequest().build();
+        }
     }
+
 
     /**
      * Account 객체를 ID로 조회
@@ -125,6 +103,31 @@ public class AuthService {
      */
     public Optional<Account> findAccount(Long kakaoId) {
         return accountRepository.findById(kakaoId);
+    }
+
+    /**
+     * 카카오 서버에 액세스 토큰으로 사용자 정보 요청
+     *
+     * @param kakaoAccessToken 카카오 액세스 토큰 값
+     * @return {@code KakaoAccountTokenDto} 사용자 정보
+     */
+    private KakaoAccountTokenDto getKakaoInfo(String kakaoAccessToken) {
+        // 카카오 서버에 토큰으로 사용자 정보 요청
+        HttpEntity<MultiValueMap<String, String>> kakaoAccountInfoRequest = createKakaoAccountInfoRequestToken(kakaoAccessToken);
+
+        // 카카오 서버로부터 받은 사용자 정보를 저장
+        ResponseEntity<String> accountInfoResponse = new RestTemplate().exchange(KAKAO_USER_INFO_URI, HttpMethod.POST, kakaoAccountInfoRequest, String.class);
+
+        // 파싱
+        ObjectMapper objectMapper = getObjectMapper();
+        KakaoAccountTokenDto kakaoAccountTokenDto;
+        try {
+            kakaoAccountTokenDto = objectMapper.readValue(accountInfoResponse.getBody(), KakaoAccountTokenDto.class);
+        } catch (JsonProcessingException e) {
+            log.error("getKakaoInfo() error: accessToken={}", kakaoAccessToken, e);
+            return null;
+        }
+        return kakaoAccountTokenDto;
     }
 
     /**
