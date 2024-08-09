@@ -2,6 +2,7 @@ package com.ss6051.backendspring.store.domain;
 
 import com.ss6051.backendspring.global.domain.Account;
 import com.ss6051.backendspring.global.domain.Role;
+import com.ss6051.backendspring.schedule.domain.Schedule;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -30,9 +31,11 @@ public class Store {
     @OneToMany(mappedBy = "store")
     private List<StoreAccount> employeeList; // 직원 목록
 
-
     @Embedded
     private Address address;
+
+    @OneToOne(mappedBy = "store", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private Schedule schedule; // 스케줄 todo 빌더에 schedule create 추가
 
     /**
      * 매장에 속한 모든 계정(사장, 관리자, 직원)을 조회한다.
