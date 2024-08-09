@@ -74,12 +74,13 @@ public class StoreService {
      * @return {@code code} 일회성 코드 생성 결과
      */
     public String generateCode(long accountId, long storeId) {
-        Optional<Account> account = authService.findAccount(accountId);
+        Optional<Account> accountOpt = authService.findAccount(accountId);
         // 회원 정보를 조회해 없는 회원이면 bad request
-        if (account.isEmpty()) {
+        if (accountOpt.isEmpty()) {
             log.info("일회성 코드 생성 중지됨 - 주어진 ID에 해당하는 계정을 찾지 못함: accountId={}", accountId);
             throw new EntityNotFoundException("해당 ID에 해당하는 사용자를 찾을 수 없음");
         }
+        Account account = accountOpt.get();
 
         // 매장 정보가 없으면 bad request
         Optional<Store> store = findStore(storeId);
@@ -89,13 +90,24 @@ public class StoreService {
         }
 
         // 매장에 소속된 관리 권한을 가진 유저가 아니면 bad request
-        if (store.get().isNotManageableAccount(account.get())) {
+        if (hasNoPermission(storeId, account)) {
             log.info("일회성 코드 생성 중지됨 - 주어진 ID에 해당하는 계정이 매장의 관리자가 아님: accountId={}, storeId={}", accountId, storeId);
             throw new UnauthorizedException("해당 매장의 관리자가 아님");
         }
 
         // 일회성 코드 생성
         return oneTimeCodeGenerator.generateUniqueCode(storeId);
+    }
+
+    /**
+     * 해당 매장에 대한 관리자 권한도 없고 사장도 아닌가?
+     * @param storeId 매장 ID
+     * @param account 계정 정보
+     * @return true: 권한이 없음, false: 권한이 있음
+     */
+    private static boolean hasNoPermission(long storeId, Account account) {
+        return !(account.getAuthoritiesToString().contains("STORE_" + storeId + "_ROLE_OWNER") ||
+                account.getAuthoritiesToString().contains("STORE_" + storeId + "_ROLE_MANAGER"));
     }
 
     /**
@@ -146,10 +158,11 @@ public class StoreService {
      * @see Role
      */
     public void updateRole(Long accountId, long storeId, String role) {
-        Account account = authService.findAccount(accountId).orElse(null);
-        if (account == null) {
+        Optional<Account> accountOpt = authService.findAccount(accountId);
+        if (accountOpt.isEmpty()) {
             throw new EntityNotFoundException("해당 ID에 해당하는 사용자를 찾을 수 없음");
         }
+        Account account = accountOpt.get();
 
         Optional<Store> findStore = findStore(storeId);
         if (findStore.isEmpty()) {
@@ -157,8 +170,7 @@ public class StoreService {
         }
 
         // 매장에 소속된 관리 권한을 가진 유저가 아니면 bad request
-        Store store = findStore.get();
-        if (store.isNotManageableAccount(account)) {
+        if (hasNoPermission(storeId, account)) {
             throw new UnauthorizedException("해당 매장의 관리자가 아님");
         }
 

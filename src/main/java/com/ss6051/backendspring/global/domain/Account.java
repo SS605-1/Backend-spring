@@ -36,6 +36,12 @@ public class Account implements UserDetails {
                 .collect(Collectors.toList());
     }
 
+    public List<String> getAuthoritiesToString() {
+        return storeAccounts.stream()
+                .map(storeAccount -> "STORE_" + storeAccount.getStore().getId() + "_ROLE_" + storeAccount.getRole().name())
+                .collect(Collectors.toList());
+    }
+
     @Override
     public String getPassword() {
         return null; // 패스워드가 필요한 경우 구현
