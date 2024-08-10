@@ -1,4 +1,4 @@
-package com.ss6051.backendspring.schedule.dto.basic;
+package com.ss6051.backendspring.schedule.basic.dto;
 
 import java.time.DayOfWeek;
 import java.time.LocalTime;

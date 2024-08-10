@@ -1,4 +1,4 @@
-package com.ss6051.backendspring.schedule.dto.actual;
+package com.ss6051.backendspring.schedule.actual.dto;
 
 import java.time.LocalDateTime;
 

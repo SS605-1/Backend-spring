@@ -1,6 +1,6 @@
-package com.ss6051.backendspring.schedule.repository;
+package com.ss6051.backendspring.schedule.actual;
 
-import com.ss6051.backendspring.schedule.domain.ActualWorkSchedule;
+import com.ss6051.backendspring.schedule.actual.domain.ActualWorkSchedule;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

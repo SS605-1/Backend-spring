@@ -1,6 +1,7 @@
-package com.ss6051.backendspring.schedule.domain;
+package com.ss6051.backendspring.schedule.basic.domain;
 
 import com.ss6051.backendspring.global.domain.Account;
+import com.ss6051.backendspring.schedule.common.domain.Schedule;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -15,25 +16,27 @@ import java.time.LocalTime;
 @ToString
 public class BasicWorkSchedule {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id; // 기본 키
+    @EmbeddedId
+    private BasicWorkScheduleId id; // 복합 키
 
     @ManyToOne
+    @MapsId("schedule")
     @JoinColumn(name = "schedule_id")
     private Schedule schedule; // 스케줄과 매핑
 
     @ManyToOne
+    @MapsId("account")
     @JoinColumn(name = "account_id")
     private Account account; // 계정과 매핑
 
     @Enumerated(EnumType.STRING)
+    @MapsId("dayOfWeek")
     private DayOfWeek dayOfWeek; // 요일
+
     private LocalTime startTime; // 시작 시간
     private LocalTime endTime; // 종료 시간
 
-    public void update(DayOfWeek dayOfWeek, LocalTime startTime, LocalTime endTime) {
-        this.dayOfWeek = dayOfWeek;
+    public void update(LocalTime startTime, LocalTime endTime) {
         this.startTime = startTime;
         this.endTime = endTime;
     }

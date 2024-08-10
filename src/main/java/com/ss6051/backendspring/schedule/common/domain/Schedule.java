@@ -1,6 +1,8 @@
-package com.ss6051.backendspring.schedule.domain;
+package com.ss6051.backendspring.schedule.common.domain;
 
 import com.ss6051.backendspring.global.domain.Account;
+import com.ss6051.backendspring.schedule.actual.domain.ActualWorkSchedule;
+import com.ss6051.backendspring.schedule.basic.domain.BasicWorkSchedule;
 import com.ss6051.backendspring.store.domain.Store;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

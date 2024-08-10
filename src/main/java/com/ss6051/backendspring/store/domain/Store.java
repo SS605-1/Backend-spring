@@ -2,7 +2,7 @@ package com.ss6051.backendspring.store.domain;
 
 import com.ss6051.backendspring.global.domain.Account;
 import com.ss6051.backendspring.global.domain.Role;
-import com.ss6051.backendspring.schedule.domain.Schedule;
+import com.ss6051.backendspring.schedule.common.domain.Schedule;
 import jakarta.persistence.*;
 import lombok.*;
 
