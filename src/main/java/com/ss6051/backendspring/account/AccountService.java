@@ -1,15 +1,15 @@
-package com.ss6051.backendspring.auth;
+package com.ss6051.backendspring.account;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.ss6051.backendspring.global.domain.Account;
-import com.ss6051.backendspring.auth.domain.AuthTokens;
-import com.ss6051.backendspring.auth.tool.AuthTokensGenerator;
-import com.ss6051.backendspring.auth.dto.KakaoAccessTokenDto;
-import com.ss6051.backendspring.auth.dto.KakaoAccountTokenDto;
-import com.ss6051.backendspring.auth.dto.LoginResponseDto;
+import com.ss6051.backendspring.account.domain.AuthTokens;
+import com.ss6051.backendspring.account.tool.AuthTokensGenerator;
+import com.ss6051.backendspring.account.dto.KakaoAccessTokenDto;
+import com.ss6051.backendspring.account.dto.KakaoAccountTokenDto;
+import com.ss6051.backendspring.account.dto.LoginResponseDto;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,7 +33,7 @@ import static com.ss6051.backendspring.Secret.*;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class AuthService {
+public class AccountService {
 
     private final AccountRepository accountRepository;
     private final AuthTokensGenerator authTokensGenerator;

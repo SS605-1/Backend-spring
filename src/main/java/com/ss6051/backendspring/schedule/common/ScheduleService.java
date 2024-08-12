@@ -1,6 +1,6 @@
 package com.ss6051.backendspring.schedule.common;
 
-import com.ss6051.backendspring.auth.AuthService;
+import com.ss6051.backendspring.account.AccountService;
 import com.ss6051.backendspring.global.domain.Account;
 import com.ss6051.backendspring.global.validator.ExistsInDatabase;
 import com.ss6051.backendspring.schedule.common.domain.Schedule;
@@ -22,7 +22,7 @@ public class ScheduleService {
     private final ScheduleRepository scheduleRepository;
 
     private final StoreService storeService;
-    private final AuthService authService;
+    private final AccountService accountService;
 
     @Transactional
     public Schedule createSchedule(@ExistsInDatabase(type = Store.class) Store store) {
@@ -43,7 +43,7 @@ public class ScheduleService {
     public ScheduleAccountPair getScheduleAndAccount(@ExistsInDatabase(type = Store.class) long storeId,
                                                      @ExistsInDatabase(type = Account.class) long accountId) {
         //noinspection OptionalGetWithoutIsPresent
-        return new ScheduleAccountPair(getSchedule(storeId), authService.findAccount(accountId).get());
+        return new ScheduleAccountPair(getSchedule(storeId), accountService.findAccount(accountId).get());
     }
 
     public Schedule getSchedule(@ExistsInDatabase(type = Account.class) long storeId) {

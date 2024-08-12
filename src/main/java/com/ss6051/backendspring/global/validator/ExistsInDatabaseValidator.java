@@ -1,6 +1,6 @@
 package com.ss6051.backendspring.global.validator;
 
-import com.ss6051.backendspring.auth.AuthService;
+import com.ss6051.backendspring.account.AccountService;
 import com.ss6051.backendspring.global.exception.EntityNotFoundByIdException;
 import com.ss6051.backendspring.store.StoreService;
 import jakarta.validation.ConstraintValidator;
@@ -13,7 +13,7 @@ public class ExistsInDatabaseValidator implements ConstraintValidator<ExistsInDa
 
     private Class<?> entityType;
 
-    private final AuthService authService;
+    private final AccountService accountService;
     private final StoreService storeService;
 
     @Override
@@ -29,7 +29,7 @@ public class ExistsInDatabaseValidator implements ConstraintValidator<ExistsInDa
         }
 
         boolean exists = switch (entityType.getSimpleName()) {
-            case "Account" -> authService.findAccount(value).isPresent();
+            case "Account" -> accountService.findAccount(value).isPresent();
             case "Store" -> storeService.findStore(value).isPresent();
             default -> false;
         };

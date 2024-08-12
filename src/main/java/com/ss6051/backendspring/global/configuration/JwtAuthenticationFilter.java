@@ -1,7 +1,7 @@
 package com.ss6051.backendspring.global.configuration;
 
 import com.ss6051.backendspring.global.domain.Account;
-import com.ss6051.backendspring.auth.AuthService;
+import com.ss6051.backendspring.account.AccountService;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.MalformedJwtException;
@@ -32,7 +32,7 @@ import static com.ss6051.backendspring.Secret.JWT_SECRET;
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    private final AuthService authService;
+    private final AccountService accountService;
     private final SecretKey key = Keys.hmacShaKeyFor(JWT_SECRET.getBytes());
 
     @Override
@@ -44,7 +44,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         if (StringUtils.hasText(token) && validateToken(token)) {
             String uid = getUserIdFromJWT(token);
 
-            Optional<Account> accountOpt = authService.findAccount(Long.parseLong(uid));
+            Optional<Account> accountOpt = accountService.findAccount(Long.parseLong(uid));
 
             if (accountOpt.isPresent()) {
                 Account account = accountOpt.get();

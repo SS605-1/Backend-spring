@@ -1,7 +1,7 @@
-package com.ss6051.backendspring.auth;
+package com.ss6051.backendspring.account;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.ss6051.backendspring.auth.dto.LoginResponseDto;
+import com.ss6051.backendspring.account.dto.LoginResponseDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
@@ -17,9 +17,9 @@ import org.springframework.web.server.ResponseStatusException;
 @RequestMapping("/oauth2/kakao")
 @Slf4j
 @RequiredArgsConstructor
-public class AuthController {
+public class AccountController {
 
-    private final AuthService authService;
+    private final AccountService accountService;
 
 
     /**
@@ -60,7 +60,7 @@ public class AuthController {
 
         LoginResponseDto dto;
         try {
-            dto = authService.kakaoLogin(code);
+            dto = accountService.kakaoLogin(code);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         } catch (Exception e) {

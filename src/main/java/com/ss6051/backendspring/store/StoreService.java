@@ -2,7 +2,7 @@ package com.ss6051.backendspring.store;
 
 
 import com.ss6051.backendspring.global.domain.Account;
-import com.ss6051.backendspring.auth.AuthService;
+import com.ss6051.backendspring.account.AccountService;
 import com.ss6051.backendspring.global.domain.Role;
 import com.ss6051.backendspring.schedule.common.ScheduleService;
 import com.ss6051.backendspring.store.domain.*;
@@ -26,7 +26,7 @@ public class StoreService {
     private final StoreRepository storeRepository;
     private final StoreAccountRepository storeAccountRepository;
 
-    private final AuthService authService;
+    private final AccountService accountService;
     private final ScheduleService scheduleService;
 
     private final OneTimeCodeGenerator oneTimeCodeGenerator;
@@ -41,7 +41,7 @@ public class StoreService {
      */
     public Store registerStore(long accountId, RegisterStoreDto registerStoreDto) {
         // accountId 조회
-        Optional<Account> account = authService.findAccount(accountId);
+        Optional<Account> account = accountService.findAccount(accountId);
 
         // account 가 존재하지 않으면 bad request
         if (account.isEmpty()) {
@@ -78,7 +78,7 @@ public class StoreService {
      * @return {@code code} 일회성 코드 생성 결과
      */
     public String generateCode(long accountId, long storeId) {
-        Optional<Account> accountOpt = authService.findAccount(accountId);
+        Optional<Account> accountOpt = accountService.findAccount(accountId);
         // 회원 정보를 조회해 없는 회원이면 bad request
         if (accountOpt.isEmpty()) {
             log.info("일회성 코드 생성 중지됨 - 주어진 ID에 해당하는 계정을 찾지 못함: accountId={}", accountId);
@@ -121,7 +121,7 @@ public class StoreService {
      * @param code      일회성 코드
      */
     public void registerEmployee(long accountId, String code) {
-        Optional<Account> account = authService.findAccount(accountId);
+        Optional<Account> account = accountService.findAccount(accountId);
         // 회원 정보를 조회해 없는 회원이면 bad request
         if (account.isEmpty()) {
             log.info("직원 등록 중지됨 - 주어진 ID에 해당하는 계정을 찾지 못함: accountId={}", accountId);
@@ -162,7 +162,7 @@ public class StoreService {
      * @see Role
      */
     public void updateRole(Long accountId, long storeId, String role) {
-        Optional<Account> accountOpt = authService.findAccount(accountId);
+        Optional<Account> accountOpt = accountService.findAccount(accountId);
         if (accountOpt.isEmpty()) {
             throw new EntityNotFoundException("해당 ID에 해당하는 사용자를 찾을 수 없음");
         }

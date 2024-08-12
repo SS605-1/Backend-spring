@@ -1,6 +1,6 @@
-package com.ss6051.backendspring.auth.dto;
+package com.ss6051.backendspring.account.dto;
 
-import com.ss6051.backendspring.auth.domain.AuthTokens;
+import com.ss6051.backendspring.account.domain.AuthTokens;
 import lombok.Builder;
 import lombok.Data;
 

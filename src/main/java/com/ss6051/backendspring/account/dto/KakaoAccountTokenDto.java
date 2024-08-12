@@ -1,4 +1,4 @@
-package com.ss6051.backendspring.auth.dto;
+package com.ss6051.backendspring.account.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
