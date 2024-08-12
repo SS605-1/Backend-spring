@@ -16,16 +16,15 @@ import java.time.LocalTime;
 @ToString
 public class BasicWorkSchedule {
 
-    @EmbeddedId
-    private BasicWorkScheduleId id; // 복합 키
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id; // 복합 키
 
     @ManyToOne
-    @MapsId("schedule")
     @JoinColumn(name = "schedule_id")
     private Schedule schedule; // 스케줄과 매핑
 
     @ManyToOne
-    @MapsId("account")
     @JoinColumn(name = "account_id")
     private Account account; // 계정과 매핑
 
