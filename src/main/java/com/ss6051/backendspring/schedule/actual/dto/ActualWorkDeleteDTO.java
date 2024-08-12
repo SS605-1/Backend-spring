@@ -6,7 +6,7 @@ package com.ss6051.backendspring.schedule.actual.dto;
  * @param id
  * @param updateDto 수정할 실제 근무 시간 DTO
  */
-public record ActualWorkUpdateDTO(
+public record ActualWorkDeleteDTO(
         long id,
         ActualWorkDTO updateDto) {
 }

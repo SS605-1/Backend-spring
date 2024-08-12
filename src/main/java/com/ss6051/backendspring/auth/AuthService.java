@@ -10,7 +10,7 @@ import com.ss6051.backendspring.auth.tool.AuthTokensGenerator;
 import com.ss6051.backendspring.auth.dto.KakaoAccessTokenDto;
 import com.ss6051.backendspring.auth.dto.KakaoAccountTokenDto;
 import com.ss6051.backendspring.auth.dto.LoginResponseDto;
-import jakarta.transaction.Transactional;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpEntity;
@@ -18,6 +18,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
@@ -92,6 +93,7 @@ public class AuthService {
      * @param kakaoId 카카오 ID
      * @return {@code Optional<Account>} Account 객체
      */
+    @Transactional(readOnly = true)
     public Optional<Account> findAccount(Long kakaoId) {
         return accountRepository.findById(kakaoId);
     }

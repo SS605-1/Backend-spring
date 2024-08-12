@@ -4,6 +4,7 @@ package com.ss6051.backendspring.store;
 import com.ss6051.backendspring.global.domain.Account;
 import com.ss6051.backendspring.auth.AuthService;
 import com.ss6051.backendspring.global.domain.Role;
+import com.ss6051.backendspring.schedule.common.ScheduleService;
 import com.ss6051.backendspring.store.domain.*;
 import com.ss6051.backendspring.auth.exception.UnauthorizedException;
 import com.ss6051.backendspring.store.dto.RegisterStoreDto;
@@ -22,11 +23,13 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class StoreService {
 
-    private final AuthService authService;
     private final StoreRepository storeRepository;
     private final StoreAccountRepository storeAccountRepository;
-    private final OneTimeCodeGenerator oneTimeCodeGenerator;
 
+    private final AuthService authService;
+    private final ScheduleService scheduleService;
+
+    private final OneTimeCodeGenerator oneTimeCodeGenerator;
 
     /**
      * 매장 정보를 등록한다.
@@ -51,6 +54,7 @@ public class StoreService {
                 .name(registerStoreDto.getStore_name())
                 .address(new Address(registerStoreDto.street_address, registerStoreDto.lot_number_address))
                 .build();
+        newStore.setSchedule(scheduleService.createSchedule(newStore));
         log.info("신규 매장 등록: store={}", newStore);
         storeRepository.save(newStore);
 

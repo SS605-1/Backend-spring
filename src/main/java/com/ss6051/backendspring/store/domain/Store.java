@@ -34,6 +34,7 @@ public class Store {
     @Embedded
     private Address address;
 
+    @Setter
     @OneToOne(mappedBy = "store", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private Schedule schedule; // 스케줄 todo 빌더에 schedule create 추가
 
@@ -57,6 +58,7 @@ public class Store {
 
     }
 
+    @Deprecated
     public boolean isNotManageableAccount(Account account) {
         return !getManageableAccounts().contains(account);
     }
