@@ -1,6 +1,6 @@
 package com.ss6051.backendspring.schedule.actual;
 
-import com.ss6051.backendspring.auth.exception.EntityNotFoundByIdException;
+import com.ss6051.backendspring.global.exception.EntityNotFoundByIdException;
 import com.ss6051.backendspring.schedule.actual.domain.ActualWorkSchedule;
 import com.ss6051.backendspring.schedule.actual.dto.*;
 import com.ss6051.backendspring.schedule.common.ScheduleService;

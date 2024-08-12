@@ -1,6 +1,6 @@
 package com.ss6051.backendspring.store;
 
-import com.ss6051.backendspring.auth.exception.UnauthorizedException;
+import com.ss6051.backendspring.global.exception.UnauthorizedException;
 import com.ss6051.backendspring.global.tool.JwtTokenProvider;
 import com.ss6051.backendspring.store.domain.Store;
 import com.ss6051.backendspring.store.dto.RegisterStoreDto;

@@ -1,4 +1,4 @@
-package com.ss6051.backendspring.auth.exception;
+package com.ss6051.backendspring.global.exception;
 
 public class EntityNotFoundByIdException extends RuntimeException {
     public EntityNotFoundByIdException(String message) {

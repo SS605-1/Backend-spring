@@ -6,7 +6,7 @@ import com.ss6051.backendspring.auth.AuthService;
 import com.ss6051.backendspring.global.domain.Role;
 import com.ss6051.backendspring.schedule.common.ScheduleService;
 import com.ss6051.backendspring.store.domain.*;
-import com.ss6051.backendspring.auth.exception.UnauthorizedException;
+import com.ss6051.backendspring.global.exception.UnauthorizedException;
 import com.ss6051.backendspring.store.dto.RegisterStoreDto;
 import com.ss6051.backendspring.store.repository.StoreAccountRepository;
 import com.ss6051.backendspring.store.repository.StoreRepository;

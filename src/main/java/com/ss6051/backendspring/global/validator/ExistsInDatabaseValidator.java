@@ -1,7 +1,7 @@
 package com.ss6051.backendspring.global.validator;
 
 import com.ss6051.backendspring.auth.AuthService;
-import com.ss6051.backendspring.auth.exception.EntityNotFoundByIdException;
+import com.ss6051.backendspring.global.exception.EntityNotFoundByIdException;
 import com.ss6051.backendspring.store.StoreService;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
