@@ -1,4 +1,4 @@
-package com.ss6051.backendspring.auth.dto;
+package com.ss6051.backendspring.account.dto;
 
 import lombok.Data;
 

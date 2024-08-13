@@ -2,6 +2,7 @@ package com.ss6051.backendspring.store.domain;
 
 import com.ss6051.backendspring.global.domain.Account;
 import com.ss6051.backendspring.global.domain.Role;
+import com.ss6051.backendspring.schedule.common.domain.Schedule;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -30,9 +31,12 @@ public class Store {
     @OneToMany(mappedBy = "store")
     private List<StoreAccount> employeeList; // 직원 목록
 
-
     @Embedded
     private Address address;
+
+    @Setter
+    @OneToOne(mappedBy = "store", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private Schedule schedule;
 
     /**
      * 매장에 속한 모든 계정(사장, 관리자, 직원)을 조회한다.
@@ -54,6 +58,7 @@ public class Store {
 
     }
 
+    @Deprecated
     public boolean isNotManageableAccount(Account account) {
         return !getManageableAccounts().contains(account);
     }

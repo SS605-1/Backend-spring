@@ -1,5 +1,7 @@
 package com.ss6051.backendspring.store.tool;
 
+import com.ss6051.backendspring.global.exception.CustomException;
+import com.ss6051.backendspring.global.exception.ErrorCode;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -50,7 +52,12 @@ public class OneTimeCodeGenerator {
         if (!usedCodes.contains(code)) {
             return null;
         }
-        return codeToStoreMap.get(code);
+        Long result = codeToStoreMap.get(code);
+        if (result == null) {
+            log.error("Code {} is used but store ID is not found", code);
+            throw new CustomException(ErrorCode.CODE_NO_STORE_MATCHES, code);
+        }
+        return result;
     }
 
     private String generateRandomCode() {

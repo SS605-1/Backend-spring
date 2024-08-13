@@ -1,6 +1,6 @@
-package com.ss6051.backendspring.auth.tool;
+package com.ss6051.backendspring.account.tool;
 
-import com.ss6051.backendspring.auth.domain.AuthTokens;
+import com.ss6051.backendspring.account.domain.AuthTokens;
 import com.ss6051.backendspring.global.tool.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;

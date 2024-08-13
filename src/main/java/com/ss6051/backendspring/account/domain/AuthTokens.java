@@ -1,4 +1,4 @@
-package com.ss6051.backendspring.auth.domain;
+package com.ss6051.backendspring.account.domain;
 
 import lombok.Builder;
 import lombok.Data;
