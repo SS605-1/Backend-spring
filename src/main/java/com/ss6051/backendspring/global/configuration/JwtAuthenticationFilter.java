@@ -1,7 +1,9 @@
 package com.ss6051.backendspring.global.configuration;
 
-import com.ss6051.backendspring.global.domain.Account;
 import com.ss6051.backendspring.account.AccountService;
+import com.ss6051.backendspring.global.domain.Account;
+import com.ss6051.backendspring.global.exception.CustomException;
+import com.ss6051.backendspring.global.exception.ErrorCode;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.MalformedJwtException;
@@ -23,7 +25,6 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.crypto.SecretKey;
 import java.io.IOException;
-import java.util.Optional;
 
 import static com.ss6051.backendspring.Secret.JWT_SECRET;
 
@@ -44,16 +45,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         if (StringUtils.hasText(token) && validateToken(token)) {
             String uid = getUserIdFromJWT(token);
 
-            Optional<Account> accountOpt = accountService.findAccount(Long.parseLong(uid));
+            Account account = accountService.findAccount(Long.parseLong(uid));
 
-            if (accountOpt.isPresent()) {
-                Account account = accountOpt.get();
+            UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+                    account, null, account.getAuthorities());
 
-                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-                        account, null, account.getAuthorities());
-
-                SecurityContextHolder.getContext().setAuthentication(authentication);
-            }
+            SecurityContextHolder.getContext().setAuthentication(authentication);
         }
 
         filterChain.doFilter(request, response);
@@ -79,19 +76,17 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private boolean validateToken(String authToken) {
         try {
             Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(authToken);
-            return true;
-        } catch (MalformedJwtException ex) {
-            // Invalid JWT token
         } catch (ExpiredJwtException ex) {
-            // Expired JWT token
-        } catch (UnsupportedJwtException ex) {
+            throw new CustomException(ErrorCode.JWT_TOKEN_EXPIRED);
+        } catch (MalformedJwtException | UnsupportedJwtException |
+                 IllegalArgumentException | SignatureException ex) {
+            // Invalid JWT token
             // Unsupported JWT token
-        } catch (IllegalArgumentException ex) {
             // JWT claims string is empty
-        } catch (SignatureException ex) {
             // JWT signature does not match locally computed signature
+            throw new CustomException(ErrorCode.JWT_TOKEN_INVALID, ex.getClass().getName());
         }
-        return false;
+        return true;
     }
 
 }

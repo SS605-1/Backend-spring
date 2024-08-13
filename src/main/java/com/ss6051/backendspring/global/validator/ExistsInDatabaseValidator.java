@@ -1,13 +1,16 @@
 package com.ss6051.backendspring.global.validator;
 
 import com.ss6051.backendspring.account.AccountService;
-import com.ss6051.backendspring.global.exception.EntityNotFoundByIdException;
+import com.ss6051.backendspring.global.exception.CustomException;
+import com.ss6051.backendspring.global.exception.ErrorCode;
 import com.ss6051.backendspring.store.StoreService;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @RequiredArgsConstructor
 public class ExistsInDatabaseValidator implements ConstraintValidator<ExistsInDatabase, Long> {
 
@@ -28,15 +31,13 @@ public class ExistsInDatabaseValidator implements ConstraintValidator<ExistsInDa
             return true; // null 값 허용 시, 검증 통과
         }
 
-        boolean exists = switch (entityType.getSimpleName()) {
-            case "Account" -> accountService.findAccount(value).isPresent();
-            case "Store" -> storeService.findStore(value).isPresent();
-            default -> throw new EntityNotFoundByIdException("지원하지 않는 엔티티 타입입니다: " + entityType.getSimpleName());
-        };
-
-        if (!exists) {
-            String errorMessage = String.format("%s type %d 값이 db에 존재하지 않습니다", entityType.getSimpleName(), value);
-            throw new EntityNotFoundByIdException(errorMessage);
+        switch (entityType.getSimpleName()) {
+            case "Account" -> accountService.findAccount(value);
+            case "Store" -> storeService.findStore(value);
+            default -> {
+                log.error("존재하지 않는 엔티티 검증 오류 발생: {}", entityType.getSimpleName());
+                throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR);
+            }
         }
 
         return true;

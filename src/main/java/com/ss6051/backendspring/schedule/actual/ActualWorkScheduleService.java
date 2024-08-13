@@ -1,6 +1,7 @@
 package com.ss6051.backendspring.schedule.actual;
 
-import com.ss6051.backendspring.global.exception.EntityNotFoundByIdException;
+import com.ss6051.backendspring.global.exception.CustomException;
+import com.ss6051.backendspring.global.exception.ErrorCode;
 import com.ss6051.backendspring.schedule.actual.domain.ActualWorkSchedule;
 import com.ss6051.backendspring.schedule.actual.dto.*;
 import com.ss6051.backendspring.schedule.common.ScheduleService;
@@ -49,7 +50,7 @@ public class ActualWorkScheduleService {
     @Transactional
     public ActualWorkSchedule updateActualWorkSchedule(ActualWorkUpdateDTO dto) {
         ActualWorkSchedule schedule = actualWorkScheduleRepository.findById(dto.id())
-                .orElseThrow(() -> new EntityNotFoundByIdException("ActualWorkSchedule", dto.id()));
+                .orElseThrow(() -> new CustomException(ErrorCode.ACTUAL_WORK_SCHEDULE_NOT_FOUND));
 
         schedule.update(dto.updateDto().startDateTime(), dto.updateDto().endDateTime());
         return actualWorkScheduleRepository.save(schedule);

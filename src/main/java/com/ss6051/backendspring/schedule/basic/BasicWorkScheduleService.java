@@ -1,5 +1,7 @@
 package com.ss6051.backendspring.schedule.basic;
 
+import com.ss6051.backendspring.global.exception.CustomException;
+import com.ss6051.backendspring.global.exception.ErrorCode;
 import com.ss6051.backendspring.schedule.basic.domain.BasicWorkSchedule;
 import com.ss6051.backendspring.schedule.common.domain.ScheduleAccountPair;
 import com.ss6051.backendspring.schedule.basic.dto.BasicWorkCreationDTO;
@@ -59,7 +61,7 @@ public class BasicWorkScheduleService {
         ScheduleAccountPair pair = scheduleService.getScheduleAndAccount(dto.storeId(), dto.accountId());
 
         BasicWorkSchedule basicWorkSchedule = basicWorkScheduleRepository.findByScheduleAndAccountAndDayOfWeek(pair.schedule(), pair.account(), dto.basicWorkDTO().dayOfWeek())
-                .orElseThrow(() -> new IllegalArgumentException("주어진 정보에 해당하는 기본 근무 시간을 찾을 수 없음"));
+                .orElseThrow(() -> new CustomException(ErrorCode.BASIC_WORK_SCHEDULE_NOT_FOUND));
 
         basicWorkSchedule.update(dto.basicWorkDTO().startTime(), dto.basicWorkDTO().endTime());
 

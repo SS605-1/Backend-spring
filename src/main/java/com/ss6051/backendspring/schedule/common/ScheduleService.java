@@ -42,13 +42,11 @@ public class ScheduleService {
 
     public ScheduleAccountPair getScheduleAndAccount(@ExistsInDatabase(type = Store.class) long storeId,
                                                      @ExistsInDatabase(type = Account.class) long accountId) {
-        //noinspection OptionalGetWithoutIsPresent
-        return new ScheduleAccountPair(getSchedule(storeId), accountService.findAccount(accountId).get());
+        return new ScheduleAccountPair(getSchedule(storeId), accountService.findAccount(accountId));
     }
 
     public Schedule getSchedule(@ExistsInDatabase(type = Store.class) long storeId) {
-        //noinspection OptionalGetWithoutIsPresent
-        return storeService.findStore(storeId).get().getSchedule();
+        return storeService.findStore(storeId).getSchedule();
 
     }
 
