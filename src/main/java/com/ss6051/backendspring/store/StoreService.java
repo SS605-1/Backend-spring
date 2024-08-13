@@ -5,7 +5,7 @@ import com.ss6051.backendspring.account.AccountService;
 import com.ss6051.backendspring.global.domain.Account;
 import com.ss6051.backendspring.global.domain.Role;
 import com.ss6051.backendspring.global.exception.UnauthorizedException;
-import com.ss6051.backendspring.schedule.common.ScheduleService;
+import com.ss6051.backendspring.schedule.common.domain.Schedule;
 import com.ss6051.backendspring.store.domain.Address;
 import com.ss6051.backendspring.store.domain.Store;
 import com.ss6051.backendspring.store.domain.StoreAccount;
@@ -14,9 +14,11 @@ import com.ss6051.backendspring.store.repository.StoreAccountRepository;
 import com.ss6051.backendspring.store.repository.StoreRepository;
 import com.ss6051.backendspring.store.tool.OneTimeCodeGenerator;
 import jakarta.persistence.EntityNotFoundException;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
@@ -29,7 +31,6 @@ public class StoreService {
     private final StoreAccountRepository storeAccountRepository;
 
     private final AccountService accountService;
-    private final ScheduleService scheduleService;
 
     private final OneTimeCodeGenerator oneTimeCodeGenerator;
 
@@ -41,6 +42,7 @@ public class StoreService {
      * @return {@code Store} 매장 정보
      * @see RegisterStoreDto
      */
+    @Transactional
     public Store registerStore(long accountId, RegisterStoreDto registerStoreDto) {
         // accountId 조회
         Optional<Account> account = accountService.findAccount(accountId);
@@ -55,12 +57,18 @@ public class StoreService {
                 .owner(account.get())
                 .name(registerStoreDto.getStore_name())
                 .address(new Address(registerStoreDto.street_address, registerStoreDto.lot_number_address))
+                .schedule(null)
                 .build();
-        newStore.setSchedule(scheduleService.createSchedule(newStore));
         log.info("신규 매장 등록: store={}", newStore);
         storeRepository.save(newStore);
 
         return newStore;
+    }
+
+    @Transactional
+    public Store setSchedule(Store newStore, Schedule schedule) {
+        newStore.setSchedule(schedule);
+        return storeRepository.save(newStore);
     }
 
     /**
@@ -68,6 +76,7 @@ public class StoreService {
      * @param storeId 조회할 매장의 ID 번호
      * @return Optional<Store> 매장 정보를 담은 Optional. 매장이 존재하지 않으면 empty
      */
+    @Transactional(readOnly = true)
     public Optional<Store> findStore(long storeId) {
         return storeRepository.findById(storeId);
     }
@@ -79,6 +88,7 @@ public class StoreService {
      * @param storeId   일회성 코드를 생성할 매장 ID
      * @return {@code code} 일회성 코드 생성 결과
      */
+    @Transactional(readOnly = true)
     public String generateCode(long accountId, long storeId) {
         Optional<Account> accountOpt = accountService.findAccount(accountId);
         // 회원 정보를 조회해 없는 회원이면 bad request
@@ -122,6 +132,7 @@ public class StoreService {
      * @param accountId 직원으로 등록할 계정 ID
      * @param code      일회성 코드
      */
+    @Transactional
     public void registerEmployee(long accountId, String code) {
         Optional<Account> account = accountService.findAccount(accountId);
         // 회원 정보를 조회해 없는 회원이면 bad request
@@ -163,6 +174,7 @@ public class StoreService {
      * @param role    권한 레벨
      * @see Role
      */
+    @Transactional
     public void updateRole(Long accountId, long storeId, String role) {
         Optional<Account> accountOpt = accountService.findAccount(accountId);
         if (accountOpt.isEmpty()) {

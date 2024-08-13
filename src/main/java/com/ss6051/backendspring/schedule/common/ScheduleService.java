@@ -21,19 +21,19 @@ public class ScheduleService {
 
     private final ScheduleRepository scheduleRepository;
 
-//    private final StoreService storeService;
-//    private final AccountService accountService;
+    private final StoreService storeService;
+    private final AccountService accountService;
 
     @Transactional
     public Schedule createSchedule(Store store) {
         Schedule schedule = Schedule.builder()
-                .storeId(store.getId())
                 .store(store)
                 .lastModifiedBy(store.getOwner())
                 .lastModifiedTime(LocalDateTime.now())
                 .build();
         return scheduleRepository.save(schedule);
     }
+
 
     @SuppressWarnings("unused")
     public void deleteSchedule() {
@@ -43,14 +43,12 @@ public class ScheduleService {
     public ScheduleAccountPair getScheduleAndAccount(@ExistsInDatabase(type = Store.class) long storeId,
                                                      @ExistsInDatabase(type = Account.class) long accountId) {
         //noinspection OptionalGetWithoutIsPresent
-        return null;
-//        return new ScheduleAccountPair(getSchedule(storeId), accountService.findAccount(accountId).get());
+        return new ScheduleAccountPair(getSchedule(storeId), accountService.findAccount(accountId).get());
     }
 
     public Schedule getSchedule(@ExistsInDatabase(type = Store.class) long storeId) {
         //noinspection OptionalGetWithoutIsPresent
-        return null;
-//        return storeService.findStore(storeId).get().getSchedule();
+        return storeService.findStore(storeId).get().getSchedule();
 
     }
 

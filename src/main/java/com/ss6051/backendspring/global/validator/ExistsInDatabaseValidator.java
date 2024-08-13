@@ -31,7 +31,7 @@ public class ExistsInDatabaseValidator implements ConstraintValidator<ExistsInDa
         boolean exists = switch (entityType.getSimpleName()) {
             case "Account" -> accountService.findAccount(value).isPresent();
             case "Store" -> storeService.findStore(value).isPresent();
-            default -> false;
+            default -> throw new EntityNotFoundByIdException("지원하지 않는 엔티티 타입입니다: " + entityType.getSimpleName());
         };
 
         if (!exists) {

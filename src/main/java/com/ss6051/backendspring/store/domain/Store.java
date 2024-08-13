@@ -36,7 +36,7 @@ public class Store {
 
     @Setter
     @OneToOne(mappedBy = "store", cascade = CascadeType.REMOVE, orphanRemoval = true)
-    private Schedule schedule; // 스케줄 todo 빌더에 schedule create 추가
+    private Schedule schedule;
 
     /**
      * 매장에 속한 모든 계정(사장, 관리자, 직원)을 조회한다.

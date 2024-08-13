@@ -2,6 +2,8 @@ package com.ss6051.backendspring.store;
 
 import com.ss6051.backendspring.global.exception.UnauthorizedException;
 import com.ss6051.backendspring.global.tool.JwtTokenProvider;
+import com.ss6051.backendspring.schedule.common.ScheduleService;
+import com.ss6051.backendspring.schedule.common.domain.Schedule;
 import com.ss6051.backendspring.store.domain.Store;
 import com.ss6051.backendspring.store.dto.RegisterStoreDto;
 import io.swagger.v3.oas.annotations.Operation;
@@ -24,6 +26,7 @@ import org.springframework.web.server.ResponseStatusException;
 public class StoreController {
 
     private final StoreService storeService;
+    private final ScheduleService scheduleService;
 
     /**
      * 매장 등록
@@ -85,7 +88,9 @@ public class StoreController {
 
         Store store;
         try {
-            store = storeService.registerStore(accountId, registerStoreDto);
+            Store store1 = storeService.registerStore(accountId, registerStoreDto);
+            Schedule schedule = scheduleService.createSchedule(store1);
+            store = storeService.setSchedule(store1, schedule);
         } catch (IllegalArgumentException e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
         }
