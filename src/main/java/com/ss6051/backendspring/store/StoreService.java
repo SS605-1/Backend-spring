@@ -14,7 +14,6 @@ import com.ss6051.backendspring.store.repository.StoreAccountRepository;
 import com.ss6051.backendspring.store.repository.StoreRepository;
 import com.ss6051.backendspring.store.tool.OneTimeCodeGenerator;
 import jakarta.persistence.EntityNotFoundException;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -33,6 +32,18 @@ public class StoreService {
     private final AccountService accountService;
 
     private final OneTimeCodeGenerator oneTimeCodeGenerator;
+
+    /**
+     * 해당 매장에 대한 관리자 권한도 없고 사장도 아닌가?
+     *
+     * @param storeId 매장 ID
+     * @param account 계정 정보
+     * @return true: 권한이 없음, false: 권한이 있음
+     */
+    private static boolean hasNoPermission(long storeId, Account account) {
+        return !(account.getAuthoritiesToString().contains("STORE_" + storeId + "_ROLE_OWNER") ||
+                account.getAuthoritiesToString().contains("STORE_" + storeId + "_ROLE_MANAGER"));
+    }
 
     /**
      * 매장 정보를 등록한다.
@@ -73,6 +84,7 @@ public class StoreService {
 
     /**
      * 매장 정보를 조회한다.
+     *
      * @param storeId 조회할 매장의 ID 번호
      * @return Optional<Store> 매장 정보를 담은 Optional. 매장이 존재하지 않으면 empty
      */
@@ -116,24 +128,14 @@ public class StoreService {
     }
 
     /**
-     * 해당 매장에 대한 관리자 권한도 없고 사장도 아닌가?
-     * @param storeId 매장 ID
-     * @param account 계정 정보
-     * @return true: 권한이 없음, false: 권한이 있음
-     */
-    private static boolean hasNoPermission(long storeId, Account account) {
-        return !(account.getAuthoritiesToString().contains("STORE_" + storeId + "_ROLE_OWNER") ||
-                account.getAuthoritiesToString().contains("STORE_" + storeId + "_ROLE_MANAGER"));
-    }
-
-    /**
      * 일회성 코드를 입력해 매장의 직원으로 등록한다.
      *
      * @param accountId 직원으로 등록할 계정 ID
      * @param code      일회성 코드
+     * @return
      */
     @Transactional
-    public void registerEmployee(long accountId, String code) {
+    public Store registerEmployee(long accountId, String code) {
         Optional<Account> account = accountService.findAccount(accountId);
         // 회원 정보를 조회해 없는 회원이면 bad request
         if (account.isEmpty()) {
@@ -162,20 +164,22 @@ public class StoreService {
         }
 
         store.get().addEmployee(account.get());
-        storeRepository.save(store.get());
+        Store save = storeRepository.save(store.get());
         log.info("직원 등록: accountId={}, storeId={}", accountId, storeId);
+        return save;
     }
 
     /**
      * 권한 변경
      *
-     * @param accountId      db에 반영되어 있는 사용자 id 값
-     * @param storeId      db에 반영되어 있는 매장 id 값
-     * @param role    권한 레벨
+     * @param accountId db에 반영되어 있는 사용자 id 값
+     * @param storeId   db에 반영되어 있는 매장 id 값
+     * @param role      권한 레벨
+     * @return
      * @see Role
      */
     @Transactional
-    public void updateRole(Long accountId, long storeId, String role) {
+    public StoreAccount updateRole(Long accountId, long storeId, String role) {
         Optional<Account> accountOpt = accountService.findAccount(accountId);
         if (accountOpt.isEmpty()) {
             throw new EntityNotFoundException("해당 ID에 해당하는 사용자를 찾을 수 없음");
@@ -199,7 +203,8 @@ public class StoreService {
 
         StoreAccount storeAccount = byStoreIdAndAccountId.get();
         storeAccount.setRole(Role.valueOf(role));
-        storeAccountRepository.save(storeAccount);
+        StoreAccount save = storeAccountRepository.save(storeAccount);
         log.info("권한 변경: accountId={}, storeId={}, role={}", accountId, storeId, role);
+        return save;
     }
 }

@@ -69,12 +69,7 @@ public class AccountService {
         try {
             // 신규 회원 가입 처리
             if (existAccount.isEmpty()) {
-                Account newAccount = Account.builder()
-                        .id(loginResponseDto.getId())
-                        .profile_image_url(loginResponseDto.getProfile_image_url())
-                        .thumbnail_image_url(loginResponseDto.getThumbnail_image_url())
-                        .nickname(loginResponseDto.getNickname())
-                        .build();
+                Account newAccount = createNewAccount(loginResponseDto);
                 accountRepository.save(newAccount);
                 log.info("신규 회원 가입처리: id={}, nickname={}", newAccount.getId(), newAccount.getNickname());
 
@@ -85,6 +80,15 @@ public class AccountService {
             log.error("회원 가입/로그인 실패: id={}, nickname={}", loginResponseDto.getId(), loginResponseDto.getNickname(), e);
             throw e;
         }
+    }
+
+    private static Account createNewAccount(LoginResponseDto loginResponseDto) {
+        return Account.builder()
+                .id(loginResponseDto.getId())
+                .profile_image_url(loginResponseDto.getProfile_image_url())
+                .thumbnail_image_url(loginResponseDto.getThumbnail_image_url())
+                .nickname(loginResponseDto.getNickname())
+                .build();
     }
 
 
