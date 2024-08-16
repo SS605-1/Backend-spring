@@ -179,4 +179,26 @@ public class ActualWorkScheduleController {
         return ResponseEntity.ok().build();
     }
 
+    @Operation(summary = "특정 기간 동안의 실제 근무 시간 조회",
+            description = "특정 기간 동안의 사용자의 실제 근무 시간을 \"분 단위로\" 조회합니다.",
+            tags = {"schedule"},
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "특정 기간 동안의 실제 근무 시간 조회 성공",
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = Long.class)))
+            }
+    )
+    @GetMapping("/worktime")
+    public ResponseEntity<?> getActualWorkTimeInPeriodOfUser(@RequestBody ActualWorkTimeRequestDTO dto) {
+        log.info("getActualWorkTimeInPeriodOfUser");
+
+        Long actualWorkTime = null;
+        try {
+            actualWorkTime = actualWorkScheduleService.getActualWorkTimeInPeriodOfUser(dto);
+        } catch (CustomException e) {
+            log.error(e.getMessage());
+        }
+
+        return ResponseEntity.ok(actualWorkTime);
+    }
+
 }

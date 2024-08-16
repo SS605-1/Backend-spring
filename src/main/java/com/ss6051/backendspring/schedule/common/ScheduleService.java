@@ -2,6 +2,8 @@ package com.ss6051.backendspring.schedule.common;
 
 import com.ss6051.backendspring.account.AccountService;
 import com.ss6051.backendspring.global.domain.Account;
+import com.ss6051.backendspring.global.exception.CustomException;
+import com.ss6051.backendspring.global.exception.ErrorCode;
 import com.ss6051.backendspring.global.validator.ExistsInDatabase;
 import com.ss6051.backendspring.schedule.common.domain.Schedule;
 import com.ss6051.backendspring.schedule.common.domain.ScheduleAccountPair;
@@ -46,7 +48,11 @@ public class ScheduleService {
     }
 
     public Schedule getSchedule(@ExistsInDatabase(type = Store.class) long storeId) {
-        return storeService.findStore(storeId).getSchedule();
+        Schedule schedule = storeService.findStore(storeId).getSchedule();
+        if (schedule == null) {
+            throw new CustomException(ErrorCode.SCHEDULE_NOT_FOUND);
+        }
+        return schedule;
 
     }
 

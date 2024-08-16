@@ -12,5 +12,5 @@ import java.util.List;
 public interface ActualWorkScheduleRepository extends JpaRepository<ActualWorkSchedule, Long> {
     List<ActualWorkSchedule> findAllBySchedule(Schedule schedule);
     List<ActualWorkSchedule> findAllByScheduleAndAccount(Schedule schedule, Account account);
-//    Optional<ActualWorkSchedule> findByScheduleAndAccountAndStartDateTime(Schedule schedule, Account account, LocalDateTime startDateTime);
+
 }
