@@ -35,6 +35,19 @@ public class StoreService {
     private final OneTimeCodeGenerator oneTimeCodeGenerator;
 
     /**
+     * 해당 매장에 대한 관리자 권한도 없고 사장도 아닌가?
+     *
+     * @param storeId 매장 ID
+     * @param account 계정 정보
+     */
+    private static void checkPermission(long storeId, Account account) {
+        List<String> authoritiesToString = account.getAuthoritiesToString();
+        if (!(authoritiesToString.contains("STORE_" + storeId + "_ROLE_OWNER") ||
+                authoritiesToString.contains("STORE_" + storeId + "_ROLE_MANAGER")))
+            throw new CustomException(ErrorCode.ROLE_ACCESS_DENIED);
+    }
+
+    /**
      * 매장 정보를 등록한다.
      *
      * @param accountId        신규 매장을 등록하는 사장의 ID 번호
@@ -68,6 +81,7 @@ public class StoreService {
 
     /**
      * 매장 정보를 조회한다.
+     *
      * @param storeId 조회할 매장의 ID 번호
      * @return Optional<Store> 매장 정보를 담은 Optional. 매장이 존재하지 않으면 empty
      */
@@ -101,18 +115,6 @@ public class StoreService {
         String code = oneTimeCodeGenerator.generateUniqueCode(storeId);
         log.info("일회성 코드 생성 완료: accountId={}, storeId={}, code={}", accountId, storeId, code);
         return code;
-    }
-
-    /**
-     * 해당 매장에 대한 관리자 권한도 없고 사장도 아닌가?
-     * @param storeId 매장 ID
-     * @param account 계정 정보
-     */
-    private static void checkPermission(long storeId, Account account) {
-        List<String> authoritiesToString = account.getAuthoritiesToString();
-        if  (!(authoritiesToString.contains("STORE_" + storeId + "_ROLE_OWNER") ||
-                authoritiesToString.contains("STORE_" + storeId + "_ROLE_MANAGER")))
-            throw new CustomException(ErrorCode.ROLE_ACCESS_DENIED);
     }
 
     /**
@@ -168,26 +170,60 @@ public class StoreService {
     /**
      * 권한 변경
      *
-     * @param accountId      db에 반영되어 있는 사용자 id 값
-     * @param storeId      db에 반영되어 있는 매장 id 값
-     * @param role    권한 레벨
+     * @param accountId db에 반영되어 있는 사용자 id 값
+     * @param storeId   db에 반영되어 있는 매장 id 값
+     * @param role      권한 레벨
      * @see Role
      */
     @Transactional
     public void updateRole(Long accountId, long storeId, String role) {
-        Account account = accountService.findAccount(accountId); // 사용자 정보 조회
-        findStore(storeId); // 매장 정보 존재 유무 체크; 예외처리는 호출한 메소드에서 함.
+        StoreAccount storeAccount = getAccount(accountId, storeId);
 
+        try {
+            if (Role.valueOf(role) == Role.OWNER) {
+                throw new CustomException(ErrorCode.ROLE_ACCESS_DENIED, "사장 권한은 변경할 수 없습니다");
+            }
+            storeAccount.setRole(Role.valueOf(role));
+
+            storeAccountRepository.save(storeAccount);
+            log.info("권한 변경: accountId={}, storeId={}, role={}", accountId, storeId, role);
+
+        } catch (IllegalArgumentException e) {
+            throw new CustomException(ErrorCode.INVALID_INPUT_VALUE, "유효하지 않은 권한입니다");
+        }
+
+    }
+
+    /**
+     * 기본급 변경
+     *
+     * @param accountId  db에 반영되어 있는 사용자 id 값
+     * @param storeId    db에 반영되어 있는 매장 id 값
+     * @param baseSalary 변경할 기본급
+     */
+    @Transactional
+    public void setBaseSalary(Long accountId, long storeId, long baseSalary) {
+        StoreAccount storeAccount = getAccount(accountId, storeId);
+        if (baseSalary < 0) {
+            throw new CustomException(ErrorCode.INVALID_INPUT_VALUE, "기본급이 0보다 작습니다");
+        }
+
+        storeAccount.setBaseSalary(baseSalary);
+        storeAccountRepository.save(storeAccount);
+        log.info("기본 급여 변경: accountId={}, storeId={}, baseSalary={}", accountId, storeId, baseSalary);
+    }
+
+    @Transactional(readOnly = true)
+    protected StoreAccount getAccount(Long accountId, long storeId) {
+        Account account = accountService.findAccount(accountId);
+        findStore(storeId);
         checkPermission(storeId, account);
 
         Optional<StoreAccount> byStoreIdAndAccountId = storeAccountRepository.findByStoreIdAndAccountId(storeId, accountId);
         if (byStoreIdAndAccountId.isEmpty()) {
-            throw new CustomException(ErrorCode.ROLE_ACCESS_DENIED);
+            throw new CustomException(ErrorCode.ACCOUNT_NOT_FOUND);
         }
 
-        StoreAccount storeAccount = byStoreIdAndAccountId.get();
-        storeAccount.setRole(Role.valueOf(role));
-        storeAccountRepository.save(storeAccount);
-        log.info("권한 변경: accountId={}, storeId={}, role={}", accountId, storeId, role);
+        return byStoreIdAndAccountId.get();
     }
 }

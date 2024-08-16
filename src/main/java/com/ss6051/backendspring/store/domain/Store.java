@@ -72,6 +72,7 @@ public class Store {
                 .store(this)
                 .account(account)
                 .role(Role.EMPLOYEE)
+                .baseSalary(0L)
                 .build());
     }
 

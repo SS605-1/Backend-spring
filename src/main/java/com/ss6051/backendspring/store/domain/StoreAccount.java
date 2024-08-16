@@ -27,5 +27,8 @@ public class StoreAccount {
     @Setter
     private Role role;
 
+    @Setter
+    private Long baseSalary;
+
 }
 

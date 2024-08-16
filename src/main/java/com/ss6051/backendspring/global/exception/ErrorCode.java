@@ -8,7 +8,7 @@ import lombok.RequiredArgsConstructor;
 public enum ErrorCode {
 
     INTERNAL_SERVER_ERROR("ERR001", "Internal Server Error"),
-    INVALID_INPUT_VALUE("ERR002", "Invalid Input Value"),
+    INVALID_INPUT_VALUE("ERR002", "잘못된 입력 값입니다."),
 
     // Account
     ACCOUNT_NOT_FOUND("ERR100", "사용자 정보를 찾을 수 없습니다."),

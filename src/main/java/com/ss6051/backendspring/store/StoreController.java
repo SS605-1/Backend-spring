@@ -244,4 +244,22 @@ public class StoreController {
         log.info("setRole() end: accountId={}, role={}", accountId, role);
         return ResponseEntity.ok().build();
     }
+
+    @Operation(summary = "기본급 설정",
+            description = "직원의 기본급을 설정합니다. 0 이상의 양수로 설정해야 합니다.",
+            tags = {"store"},
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "기본급 설정 성공"),
+            })
+    @PostMapping("/set-salary")
+    public ResponseEntity<?> setBaseSalary(@RequestParam("employeeId") long employeeId, @RequestParam("salary") long salary) {
+        log.info("setSalary() start");
+
+        long accountId = JwtTokenProvider.getAccountIdFromSecurity();
+
+        storeService.setBaseSalary(accountId, employeeId, salary);
+
+        log.info("setSalary() end");
+        return ResponseEntity.ok().build();
+    }
 }
