@@ -75,6 +75,11 @@ public class Store {
                 .build());
     }
 
+    public void removeAccount(Account account) {
+        managerList.removeIf(storeAccount -> storeAccount.getAccount().equals(account));
+        employeeList.removeIf(storeAccount -> storeAccount.getAccount().equals(account));
+    }
+
     /**
      * 해당 매장 소속 계정을 조회하는 스트림을 반환한다.
      */

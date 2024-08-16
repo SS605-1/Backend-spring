@@ -201,6 +201,25 @@ public class StoreController {
         return ResponseEntity.ok().build();
     }
 
+    @Operation(summary = "직원 삭제",
+            description = "매장의 직원을 삭제합니다.",
+            tags = {"store"},
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "직원 삭제 성공")
+            })
+    @DeleteMapping("/delete/employee")
+    public ResponseEntity<?> deleteEmployee(@RequestParam("employeeId") long employeeId) {
+        log.info("deleteEmployee() start");
+
+        long accountId = JwtTokenProvider.getAccountIdFromSecurity();
+
+        storeService.deleteEmployee(accountId, employeeId);
+
+        log.info("deleteEmployee() end");
+        return ResponseEntity.ok().build();
+    }
+
+
     /**
      * 권한 설정
      *

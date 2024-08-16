@@ -143,6 +143,28 @@ public class StoreService {
         log.info("직원 등록: accountId={}, storeId={}", accountId, storeId);
     }
 
+    @Transactional
+    public void deleteEmployee(long accountId, long storeId) {
+        log.info("직원 삭제 시작: accountId={}, storeId={}", accountId, storeId);
+        Account account = accountService.findAccount(accountId);
+        Store store = findStore(storeId);
+
+        if (store.getOwner().equals(account)) {
+            log.info("직원 삭제 중지됨 - 사장은 삭제할 수 없음: accountId={}, storeId={}", accountId, storeId);
+            throw new CustomException(ErrorCode.ROLE_ACCESS_DENIED);
+        }
+
+        // 매장에 소속된 직원이 아니면 bad request
+        if (!store.getAllAccounts().contains(account)) {
+            log.info("직원 삭제 중지됨 - 매장에 소속되지 않은 직원: accountId={}, storeId={}", accountId, storeId);
+            throw new CustomException(ErrorCode.ACCOUNT_NOT_FOUND);
+        }
+
+        store.removeAccount(account);
+        storeRepository.save(store);
+        log.info("직원 삭제: accountId={}, storeId={}", accountId, storeId);
+    }
+
     /**
      * 권한 변경
      *
