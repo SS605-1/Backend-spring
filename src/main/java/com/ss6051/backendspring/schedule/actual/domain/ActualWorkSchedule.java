@@ -5,6 +5,7 @@ import com.ss6051.backendspring.schedule.common.domain.Schedule;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 
 @Entity
@@ -28,6 +29,10 @@ public class ActualWorkSchedule {
     private Account account;
     private LocalDateTime startDateTime; // 실제 근무 시작 일시
     private LocalDateTime endDateTime;   // 실제 근무 종료 일시
+
+    public Long getActualWorkTimeMinute() {
+        return Duration.between(startDateTime, endDateTime).toMinutes(); // 초 단위 절사
+    }
 
     public void update(LocalDateTime startDateTime, LocalDateTime endDateTime) {
         this.startDateTime = startDateTime;

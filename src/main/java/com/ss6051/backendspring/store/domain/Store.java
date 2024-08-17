@@ -72,7 +72,13 @@ public class Store {
                 .store(this)
                 .account(account)
                 .role(Role.EMPLOYEE)
+                .baseSalary(0L)
                 .build());
+    }
+
+    public void removeAccount(Account account) {
+        managerList.removeIf(storeAccount -> storeAccount.getAccount().equals(account));
+        employeeList.removeIf(storeAccount -> storeAccount.getAccount().equals(account));
     }
 
     /**
