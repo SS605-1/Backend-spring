@@ -24,7 +24,7 @@ public class ActualWorkScheduleService {
     private final ScheduleService scheduleService;
 
     @Transactional
-    public void createActualWorkSchedule(ActualWorkCreationDTO dto) {
+    public Long createActualWorkSchedule(ActualWorkCreationDTO dto) {
         ScheduleAccountPair pair = scheduleService.getScheduleAndAccount(dto.storeId(), dto.accountId());
 
         ActualWorkSchedule schedule = ActualWorkSchedule.builder()
@@ -33,7 +33,8 @@ public class ActualWorkScheduleService {
                 .startDateTime(dto.actualWorkDTO().startDateTime())
                 .endDateTime(dto.actualWorkDTO().endDateTime())
                 .build();
-        actualWorkScheduleRepository.save(schedule);
+        ActualWorkSchedule save = actualWorkScheduleRepository.save(schedule);
+        return save.getId();
     }
 
     @Transactional(readOnly = true)
@@ -65,6 +66,7 @@ public class ActualWorkScheduleService {
     /**
      * 사용자의 특정 기간 동안의 실제 근무 시간 합을 분 단위로 조회한다.
      * 시작일부터 종료일 사이에 기록된 실제 근무 시간이 조회 대상이며, 기준 시각은 dto 입력으로 받는다..
+     *
      * @param dto
      * @return
      */
