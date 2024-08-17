@@ -26,7 +26,7 @@ public enum ErrorCode {
     ROLE_ACCESS_DENIED("ERR300", "해당 작업을 수행할 권한이 없습니다."),
 
     // Schedule
-    SCHEDULE_NOT_FOUND("ERR400", "Schedule Not Found"),
+    SCHEDULE_NOT_FOUND("ERR400", "스케줄을 찾을 수 없습니다."),
     SCHEDULE_DUPLICATION("ERR401", "Schedule is already exist"),
 
     // BasicWorkSchedule
