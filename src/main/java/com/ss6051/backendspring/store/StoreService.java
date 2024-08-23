@@ -226,4 +226,10 @@ public class StoreService {
 
         return byStoreIdAndAccountId.get();
     }
+
+    @Transactional(readOnly = true)
+    public List<Long> findAllByAccountId(Long accountId) {
+        return storeAccountRepository.findAllByAccountId(accountId).stream().map(storeAccount ->
+                storeAccount.getStore().getId()).toList();
+    }
 }

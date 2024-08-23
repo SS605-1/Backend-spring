@@ -1,6 +1,7 @@
 package com.ss6051.backendspring.account;
 
 import com.ss6051.backendspring.account.dto.LoginResponseDto;
+import com.ss6051.backendspring.store.StoreService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
@@ -20,7 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class AccountController {
 
     private final AccountService accountService;
-
+    private final StoreService storeService;
 
     /**
      * 카카오 로그인
@@ -44,7 +45,8 @@ public class AccountController {
                                                 "refreshToken": "d3c3N2NiMTk1OGNiMzNkNzRiOGNkY2QwMDk3.mklq2fo12mkldmfklmxlfmeklmlsmlfxmlkdmflxfsfnmlxkmdlfkmlk2x190u0t92uNGM3M.Dc0YzJmY2I1YjQxZWI5NDM1YzUzNTg0ZmY3NmUyN2I0NzU1YQ",
                                                 "grantType": "Bearer",
                                                 "expiresIn": 3600
-                                              }
+                                              },
+                                              "storeIds": [1, 2, 3]
                                             }
                                             """)}))
             })
@@ -53,6 +55,7 @@ public class AccountController {
         log.info("kakaoLogin() start");
 
         LoginResponseDto dto = accountService.kakaoLogin(code);
+        dto.setStoreIds(storeService.findAllByAccountId(dto.getId()));
 
         log.info("kakaoLogin() end");
         return ResponseEntity.ok(dto);
