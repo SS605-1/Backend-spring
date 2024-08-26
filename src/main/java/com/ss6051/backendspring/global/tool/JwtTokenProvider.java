@@ -1,6 +1,7 @@
 package com.ss6051.backendspring.global.tool;
 
 import com.ss6051.backendspring.Secret;
+import com.ss6051.backendspring.global.domain.Account;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
@@ -23,7 +24,7 @@ public class JwtTokenProvider {
      * Spring Security 에서 로그인한 사용자의 ID를 가져온다.
      */
     public static long getAccountIdFromSecurity() {
-        return (long) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        return ((Account) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getId();
     }
 
     public String accessTokenGenerate(String subject, Date expiredAt) {
