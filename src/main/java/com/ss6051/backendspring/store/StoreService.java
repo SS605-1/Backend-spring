@@ -118,7 +118,6 @@ public class StoreService {
     public Store findStore(Long storeId) {
         Optional<Store> byId = storeRepository.findById(storeId);
         if (byId.isEmpty()) {
-            log.error("findStore() error: entity not found by storeId={}", storeId);
             throw new CustomException(ErrorCode.STORE_NOT_FOUND, storeId.toString());
         }
         return byId.get();
