@@ -70,6 +70,7 @@ public class LogAspect {
         log.info("[{}] {}", params.get("http_method"), params.get("request_uri"));
         log.info("method: {}.{}", params.get("controller") ,params.get("method"));
         log.info("params: {}", params.get("params"));
+        log.info("body: {}", params.get("body"));
 
         return joinPoint.proceed();
 }
