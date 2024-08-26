@@ -70,21 +70,25 @@ public class StoreService {
     public Store registerStore(long accountId, RegisterStoreDto registerStoreDto) {
         // accountId 조회
         Account account = accountService.findAccount(accountId);
-        boolean isExistAddress = addressRepository.existsByStreet_addressOrLot_number_address(registerStoreDto.street_address, registerStoreDto.lot_number_address);
+
+        // 주소 중복 체크
+        boolean isExistAddress = addressRepository.existsByStreetAddressOrLotNumberAddress(registerStoreDto.streetAddress, registerStoreDto.lotNumberAddress);
         if (isExistAddress) {
             log.error("registerStore() error: address already exists");
             throw new CustomException(ErrorCode.ADDRESS_ALREADY_EXISTS);
         }
 
+        // 주소 저장
+        Address address = addressRepository.save(Address.builder()
+                .streetAddress(registerStoreDto.streetAddress)
+                .lotNumberAddress(registerStoreDto.lotNumberAddress)
+                .build());
 
-        // account 가 존재하면 매장 정보 등록
+        // 매장 저장
         Store newStore = Store.builder()
                 .owner(account)
-                .name(registerStoreDto.getStore_name())
-                .address(Address.builder()
-                        .street_address(registerStoreDto.street_address)
-                        .lot_number_address(registerStoreDto.lot_number_address)
-                        .build())
+                .name(registerStoreDto.getStoreName())
+                .address(address)
                 .schedule(null)
                 .build();
         log.info("신규 매장 등록: store={}", newStore);

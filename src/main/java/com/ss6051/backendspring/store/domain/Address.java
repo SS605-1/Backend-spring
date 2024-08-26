@@ -17,6 +17,6 @@ public class Address {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String street_address; // 도로명주소
-    private String lot_number_address; // 지번주소
+    private String streetAddress; // 도로명주소
+    private String lotNumberAddress; // 지번주소
 }

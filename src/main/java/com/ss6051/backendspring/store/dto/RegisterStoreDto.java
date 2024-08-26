@@ -10,7 +10,7 @@ import lombok.Data;
  */
 @Data
 public class RegisterStoreDto {
-    public String store_name;
-    public String street_address;
-    public String lot_number_address;
+    public String storeName;
+    public String streetAddress;
+    public String lotNumberAddress;
 }
