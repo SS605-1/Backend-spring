@@ -3,7 +3,6 @@ package com.ss6051.backendspring.global.tool;
 import com.ss6051.backendspring.Secret;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -17,8 +16,7 @@ public class JwtTokenProvider {
     private static final String secretKey = Secret.JWT_SECRET;
 
     public JwtTokenProvider() {
-        byte[] keyBytes = Decoders.BASE64.decode(secretKey);
-        this.key = Keys.hmacShaKeyFor(keyBytes);
+        this.key = Keys.hmacShaKeyFor(secretKey.getBytes());
     }
 
     /**
