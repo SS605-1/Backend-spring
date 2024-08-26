@@ -290,17 +290,13 @@ public class StoreController {
                             content = @Content(mediaType = "application/json", schema = @Schema(implementation = List.class),
                                     examples = {
                                             @ExampleObject(value = """
-                                                    [1, 2, 3]""")
+                                                    [백채김치찌개 성신여대입구역점, CU 성북정릉점]""")
                                     }))
             })
     @GetMapping("/user")
-    public ResponseEntity<List<Long>> getAllAssignedStores() {
+    public ResponseEntity<?> getAllAssignedStores() {
         long accountId = JwtTokenProvider.getAccountIdFromSecurity();
-        List<Long> allByAccountId = storeService.findAllByAccountId(accountId);
-        log.info("getAllAssignedStores allByAccountId={}", allByAccountId);
-        ResponseEntity<List<Long>> body = ResponseEntity.ok().body(allByAccountId);
-        log.info("getAllAssignedStores body={}", body);
-        return body;
+        return ResponseEntity.ok(storeService.findAllStoreNameByAccountId(accountId));
     }
 
     @Operation(summary = "권한 확인",

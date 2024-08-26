@@ -271,4 +271,11 @@ public class StoreService {
         return allByAccountId.stream().map(storeAccount ->
                 storeAccount.getStore().getId()).toList();
     }
+    @Transactional(readOnly = true)
+    public List<String> findAllStoreNameByAccountId(Long accountId) {
+        List<StoreAccount> allByAccountId = storeAccountRepository.findAllByAccountId(accountId);
+        log.info("회원 ID로 조회한 매장 ID 목록: accountId={}, storeId={}", accountId, allByAccountId);
+        return allByAccountId.stream().map(storeAccount ->
+                storeAccount.getStore().getName()).toList();
+    }
 }
