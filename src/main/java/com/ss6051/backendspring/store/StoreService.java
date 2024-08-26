@@ -11,6 +11,7 @@ import com.ss6051.backendspring.store.domain.Address;
 import com.ss6051.backendspring.store.domain.Store;
 import com.ss6051.backendspring.store.domain.StoreAccount;
 import com.ss6051.backendspring.store.dto.RegisterStoreDto;
+import com.ss6051.backendspring.store.repository.AddressRepository;
 import com.ss6051.backendspring.store.repository.StoreAccountRepository;
 import com.ss6051.backendspring.store.repository.StoreRepository;
 import com.ss6051.backendspring.store.tool.OneTimeCodeGenerator;
@@ -29,6 +30,7 @@ public class StoreService {
 
     private final StoreRepository storeRepository;
     private final StoreAccountRepository storeAccountRepository;
+    private final AddressRepository addressRepository;
 
     private final AccountService accountService;
 
@@ -68,12 +70,21 @@ public class StoreService {
     public Store registerStore(long accountId, RegisterStoreDto registerStoreDto) {
         // accountId 조회
         Account account = accountService.findAccount(accountId);
+        boolean isExistAddress = addressRepository.existsByStreet_addressOrLot_number_address(registerStoreDto.street_address, registerStoreDto.lot_number_address);
+        if (isExistAddress) {
+            log.error("registerStore() error: address already exists");
+            throw new CustomException(ErrorCode.ADDRESS_ALREADY_EXISTS);
+        }
+
 
         // account 가 존재하면 매장 정보 등록
         Store newStore = Store.builder()
                 .owner(account)
                 .name(registerStoreDto.getStore_name())
-                .address(new Address(registerStoreDto.street_address, registerStoreDto.lot_number_address))
+                .address(Address.builder()
+                        .street_address(registerStoreDto.street_address)
+                        .lot_number_address(registerStoreDto.lot_number_address)
+                        .build())
                 .schedule(null)
                 .build();
         log.info("신규 매장 등록: store={}", newStore);

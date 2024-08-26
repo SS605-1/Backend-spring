@@ -22,7 +22,7 @@ public class Store {
     private Long id;
     private String name;
 
-    @OneToOne
+    @ManyToOne
     private Account owner; // 사장
 
     @OneToMany(mappedBy = "store")
@@ -31,7 +31,7 @@ public class Store {
     @OneToMany(mappedBy = "store")
     private List<StoreAccount> employeeList; // 직원 목록
 
-    @Embedded
+    @OneToOne(cascade = CascadeType.REMOVE, orphanRemoval = true)
     private Address address;
 
     @Setter

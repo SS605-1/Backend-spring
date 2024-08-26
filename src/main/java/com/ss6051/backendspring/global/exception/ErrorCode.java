@@ -42,7 +42,10 @@ public enum ErrorCode {
 
     // JWT
     JWT_TOKEN_EXPIRED("ERR600", "JWT Token Expired"),
-    JWT_TOKEN_INVALID("ERR601", "JWT Token Invalid");
+    JWT_TOKEN_INVALID("ERR601", "JWT Token Invalid"),
+
+    // Address
+    ADDRESS_ALREADY_EXISTS("ERR700", "이미 다른 가게에 등록된 주소입니다."),;
 
     private final String code;
     private final String message;
