@@ -298,7 +298,9 @@ public class StoreController {
         long accountId = JwtTokenProvider.getAccountIdFromSecurity();
         List<Long> allByAccountId = storeService.findAllByAccountId(accountId);
         log.info("getAllAssignedStores allByAccountId={}", allByAccountId);
-        return ResponseEntity.ok().body(allByAccountId);
+        ResponseEntity<List<Long>> body = ResponseEntity.ok().body(allByAccountId);
+        log.info("getAllAssignedStores body={}", body);
+        return body;
     }
 
     @Operation(summary = "권한 확인",
