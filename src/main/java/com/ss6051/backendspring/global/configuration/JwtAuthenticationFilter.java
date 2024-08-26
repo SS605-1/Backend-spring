@@ -42,22 +42,22 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(@Nonnull HttpServletRequest request,
                                     @Nonnull HttpServletResponse response,
                                     @Nonnull FilterChain filterChain) throws ServletException, IOException {
-        log.info("JwtAuthenticationFilter.doFilterInternal start");
+        log.debug("JwtAuthenticationFilter.doFilterInternal start");
         String token = getJwtFromRequest(request);
 
         if (StringUtils.hasText(token) && validateToken(token)) {
             String uid = getUserIdFromJWT(token);
-            log.info("JWT Token validated, finding account for user ID: {}", uid);
+            log.debug("JWT Token validated, finding account for user ID: {}", uid);
             Account account = accountService.findAccount(Long.parseLong(uid));
 
             UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
                     account, null, account.getAuthorities());
-            log.info("Account found: {}", account);
+            log.debug("Account found: {}", account);
 
             SecurityContextHolder.getContext().setAuthentication(authentication);
         }
 
-        log.info("JwtAuthenticationFilter.doFilterInternal end");
+        log.debug("JwtAuthenticationFilter.doFilterInternal end");
         filterChain.doFilter(request, response);
     }
 
