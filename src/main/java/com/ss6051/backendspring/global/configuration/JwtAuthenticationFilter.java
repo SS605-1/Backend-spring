@@ -16,6 +16,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.hibernate.annotations.Filter;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -28,6 +29,7 @@ import java.io.IOException;
 
 import static com.ss6051.backendspring.Secret.JWT_SECRET;
 
+@Slf4j
 @Filter(name = "JwtAuthenticationFilter")
 @Component
 @RequiredArgsConstructor
@@ -40,6 +42,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(@Nonnull HttpServletRequest request,
                                     @Nonnull HttpServletResponse response,
                                     @Nonnull FilterChain filterChain) throws ServletException, IOException {
+        log.info("JwtAuthenticationFilter.doFilterInternal start");
         String token = getJwtFromRequest(request);
 
         if (StringUtils.hasText(token) && validateToken(token)) {
@@ -53,6 +56,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             SecurityContextHolder.getContext().setAuthentication(authentication);
         }
 
+        log.info("JwtAuthenticationFilter.doFilterInternal end");
         filterChain.doFilter(request, response);
     }
 
@@ -84,6 +88,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             // Unsupported JWT token
             // JWT claims string is empty
             // JWT signature does not match locally computed signature
+            log.error("JWT token error: {}", ex.getMessage());
             throw new CustomException(ErrorCode.JWT_TOKEN_INVALID, ex.getClass().getName());
         }
         return true;
