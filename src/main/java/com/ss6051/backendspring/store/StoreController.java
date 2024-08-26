@@ -294,12 +294,11 @@ public class StoreController {
                                     }))
             })
     @GetMapping("/user")
-    public ResponseEntity<?> getAllAssignedStores() {
+    public ResponseEntity<List<Long>> getAllAssignedStores() {
         long accountId = JwtTokenProvider.getAccountIdFromSecurity();
         List<Long> allByAccountId = storeService.findAllByAccountId(accountId);
         log.info("getAllAssignedStores allByAccountId={}", allByAccountId);
-        log.info("getAllAssignedStores() end");
-        return ResponseEntity.ok(allByAccountId);
+        return ResponseEntity.ok().body(allByAccountId);
     }
 
     @Operation(summary = "권한 확인",
