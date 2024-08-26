@@ -47,11 +47,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         if (StringUtils.hasText(token) && validateToken(token)) {
             String uid = getUserIdFromJWT(token);
-
+            log.info("JWT Token validated, finding account for user ID: {}", uid);
             Account account = accountService.findAccount(Long.parseLong(uid));
 
             UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
                     account, null, account.getAuthorities());
+            log.info("Account found: {}", account);
 
             SecurityContextHolder.getContext().setAuthentication(authentication);
         }

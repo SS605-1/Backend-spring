@@ -150,7 +150,10 @@ public class AccountService {
             log.error("findAccount() error: entity not found by kakaoId={}", kakaoId);
             throw new CustomException(ErrorCode.ACCOUNT_NOT_FOUND, kakaoId.toString());
         }
-        return byId.get();
+        Account account = byId.get();
+        // 강제로 lazy-loading을 트리거
+        account.getStoreAccounts().size();
+        return account;
     }
 
     /**
