@@ -197,10 +197,10 @@ public class StoreController {
         // 쿠키의 accountId 값으로 매장 ID를 조회해야 하므로 파라미터로 쿠키의 회원 아이디 넘기기
         long accountId = JwtTokenProvider.getAccountIdFromSecurity();
 
-        storeService.registerEmployee(accountId, code);
+        Long storeId = storeService.registerEmployee(accountId, code);
 
         log.info("registerEmployee() end");
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(storeId);
     }
 
     @Operation(summary = "직원 삭제",

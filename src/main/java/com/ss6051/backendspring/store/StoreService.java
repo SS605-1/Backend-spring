@@ -124,7 +124,7 @@ public class StoreService {
      * @param code      일회성 코드
      */
     @Transactional
-    public void registerEmployee(long accountId, String code) {
+    public Long registerEmployee(long accountId, String code) {
         log.info("직원 등록 시작: accountId={}, code={}", accountId, code);
         Account account = accountService.findAccount(accountId);
 
@@ -143,6 +143,7 @@ public class StoreService {
         store.addEmployee(account);
         storeRepository.save(store);
         log.info("직원 등록: accountId={}, storeId={}", accountId, storeId);
+        return storeId;
     }
 
     @Transactional
