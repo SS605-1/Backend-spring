@@ -60,9 +60,14 @@ public class BasicWorkScheduleService {
 
         ScheduleAccountPair pair = scheduleService.getScheduleAndAccount(dto.storeId(), dto.accountId());
 
-        BasicWorkSchedule basicWorkSchedule = basicWorkScheduleRepository.findByScheduleAndAccountAndDayOfWeek(pair.schedule(), pair.account(), dto.basicWorkDTO().dayOfWeek())
-                .orElseThrow(() -> new CustomException(ErrorCode.BASIC_WORK_SCHEDULE_NOT_FOUND));
-
+        BasicWorkSchedule basicWorkSchedule = null;
+        Optional<BasicWorkSchedule> basicWorkScheduleOpt = basicWorkScheduleRepository.findByScheduleAndAccountAndDayOfWeek(pair.schedule(), pair.account(), dto.basicWorkDTO().dayOfWeek());
+        if (basicWorkScheduleOpt.isEmpty()) {
+            createBasicWorkSchedule(new BasicWorkCreationDTO(dto.storeId(), dto.accountId()));
+            basicWorkSchedule = basicWorkScheduleRepository.findByScheduleAndAccountAndDayOfWeek(pair.schedule(), pair.account(), dto.basicWorkDTO().dayOfWeek())
+                    .orElseThrow(() -> new CustomException(ErrorCode.BASIC_WORK_SCHEDULE_NOT_FOUND));
+        }
+        assert basicWorkSchedule != null;
         basicWorkSchedule.update(dto.basicWorkDTO().startTime(), dto.basicWorkDTO().endTime());
 
         return basicWorkScheduleRepository.save(basicWorkSchedule);

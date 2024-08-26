@@ -45,9 +45,11 @@ public class BasicWorkScheduleController {
                                                "endTime": "17:00:00" // LocalTime 포맷
                                              }
                                             """)}))
-            }
+            },
+            deprecated = true
     )
     @PostMapping("")
+    @Deprecated
     public ResponseEntity<?> createBasicWorkSchedule(@RequestBody BasicWorkCreationDTO dto) {
         log.info("createBasicWorkSchedule");
         return ResponseEntity.ok(basicWorkScheduleService.createBasicWorkSchedule(dto));

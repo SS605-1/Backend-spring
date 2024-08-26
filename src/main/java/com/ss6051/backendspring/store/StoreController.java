@@ -15,6 +15,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/store")
 @Slf4j
@@ -262,4 +264,40 @@ public class StoreController {
         log.info("setSalary() end");
         return ResponseEntity.ok().build();
     }
+
+    @Operation(summary = "매장 조회",
+            description = "사용자가 등록된 모든 매장을 조회합니다. (pathvariable로 사용자 id를 받아 조회)",
+            tags = {"store"},
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "매장 조회 성공",
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = List.class),
+                                    examples = {
+                                            @ExampleObject(value = """
+                                                    [1, 2, 3]""")
+                                    }))
+            })
+    @GetMapping("/user/{accountId}")
+    public ResponseEntity<?> getAllAssignedStores(@PathVariable long accountId) {
+        List<Long> allByAccountId = storeService.findAllByAccountId(accountId);
+        return ResponseEntity.ok(allByAccountId);
+    }
+
+    @Operation(summary = "매장 조회",
+            description = "사용자가 등록된 모든 매장을 조회합니다. (jwt 토큰 값에서 사용자 id를 파싱해서 조회)",
+            tags = {"store"},
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "매장 조회 성공",
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = List.class),
+                                    examples = {
+                                            @ExampleObject(value = """
+                                                    [1, 2, 3]""")
+                                    }))
+            })
+    @GetMapping("/user")
+    public ResponseEntity<?> getAllAssignedStores() {
+        long accountId = JwtTokenProvider.getAccountIdFromSecurity();
+        List<Long> allByAccountId = storeService.findAllByAccountId(accountId);
+        return ResponseEntity.ok(allByAccountId);
+    }
+
 }
