@@ -1,16 +1,16 @@
 package com.ss6051.backendspring.store.domain;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Builder
+@ToString
 public class Address {
 
     @Id
@@ -19,4 +19,8 @@ public class Address {
 
     private String streetAddress; // 도로명주소
     private String lotNumberAddress; // 지번주소
+
+    @OneToOne(mappedBy = "address")
+    @JsonIgnore
+    private Store store;
 }
