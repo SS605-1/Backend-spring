@@ -26,6 +26,7 @@ public class Schedule {
     @Setter
     @JoinColumn(name = "store_id")
     @JsonIgnore
+    @ToString.Exclude
     private Store store; // 가게 정보
 
     @OneToMany(mappedBy = "schedule", cascade = CascadeType.ALL, orphanRemoval = true)
