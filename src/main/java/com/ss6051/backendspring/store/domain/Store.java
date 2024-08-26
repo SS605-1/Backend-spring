@@ -1,12 +1,12 @@
 package com.ss6051.backendspring.store.domain;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.ss6051.backendspring.global.domain.Account;
 import com.ss6051.backendspring.global.domain.Role;
 import com.ss6051.backendspring.schedule.common.domain.Schedule;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -27,10 +27,12 @@ public class Store {
     private Account owner; // 사장
 
     @OneToMany(mappedBy = "store")
-    private List<StoreAccount> managerList; // 직원 목록
+    @Builder.Default
+    private List<StoreAccount> managerList = new ArrayList<>(); // 직원 목록
 
     @OneToMany(mappedBy = "store")
-    private List<StoreAccount> employeeList; // 직원 목록
+    @Builder.Default
+    private List<StoreAccount> employeeList = new ArrayList<>(); // 직원 목록
 
     @OneToOne(cascade = CascadeType.REMOVE, orphanRemoval = true)
     private Address address;
