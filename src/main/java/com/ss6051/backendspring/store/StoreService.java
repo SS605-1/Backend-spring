@@ -181,9 +181,11 @@ public class StoreService {
         StoreAccount storeAccount = getAccount(accountId, storeId);
 
         try {
+            /* 이 부분은 프론트에서 실제 직원 권한 변경 때 막아두는게 좋을듯.
             if (Role.valueOf(role) == Role.OWNER) {
                 throw new CustomException(ErrorCode.ROLE_ACCESS_DENIED, "사장 권한은 변경할 수 없습니다");
             }
+            */
             storeAccount.setRole(Role.valueOf(role));
 
             storeAccountRepository.save(storeAccount);
