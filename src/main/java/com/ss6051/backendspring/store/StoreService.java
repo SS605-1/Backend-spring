@@ -266,7 +266,9 @@ public class StoreService {
 
     @Transactional(readOnly = true)
     public List<Long> findAllByAccountId(Long accountId) {
-        return storeAccountRepository.findAllByAccountId(accountId).stream().map(storeAccount ->
+        List<StoreAccount> allByAccountId = storeAccountRepository.findAllByAccountId(accountId);
+        log.info("회원 ID로 조회한 매장 ID 목록: accountId={}, storeId={}", accountId, allByAccountId);
+        return allByAccountId.stream().map(storeAccount ->
                 storeAccount.getStore().getId()).toList();
     }
 }
