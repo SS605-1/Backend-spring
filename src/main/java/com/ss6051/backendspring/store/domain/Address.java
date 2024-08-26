@@ -1,6 +1,5 @@
 package com.ss6051.backendspring.store.domain;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
@@ -22,5 +21,6 @@ public class Address {
 
     @OneToOne(mappedBy = "address")
     @JsonIgnore
+    @ToString.Exclude
     private Store store;
 }
