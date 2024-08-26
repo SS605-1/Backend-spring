@@ -1,5 +1,6 @@
 package com.ss6051.backendspring.schedule.common.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.ss6051.backendspring.global.domain.Account;
 import com.ss6051.backendspring.schedule.actual.domain.ActualWorkSchedule;
 import com.ss6051.backendspring.schedule.basic.domain.BasicWorkSchedule;
@@ -24,6 +25,7 @@ public class Schedule {
     @OneToOne
     @Setter
     @JoinColumn(name = "store_id")
+    @JsonIgnore
     private Store store; // 가게 정보
 
     @OneToMany(mappedBy = "schedule", cascade = CascadeType.ALL, orphanRemoval = true)
