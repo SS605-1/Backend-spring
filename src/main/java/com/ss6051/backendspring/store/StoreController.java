@@ -297,6 +297,8 @@ public class StoreController {
     public ResponseEntity<?> getAllAssignedStores() {
         long accountId = JwtTokenProvider.getAccountIdFromSecurity();
         List<Long> allByAccountId = storeService.findAllByAccountId(accountId);
+        log.info("getAllAssignedStores allByAccountId={}", allByAccountId);
+        log.info("getAllAssignedStores() end");
         return ResponseEntity.ok(allByAccountId);
     }
 
