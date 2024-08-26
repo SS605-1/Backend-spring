@@ -67,7 +67,7 @@ public class StoreController {
                                                     }""")}))
             })
     @PostMapping("/register")
-    public ResponseEntity<?> registerStore(@ModelAttribute RegisterStoreDto registerStoreDto) {
+    public ResponseEntity<?> registerStore(@RequestBody RegisterStoreDto registerStoreDto) {
         log.info("registerStore() start");
 
         long accountId = JwtTokenProvider.getAccountIdFromSecurity();
@@ -75,7 +75,7 @@ public class StoreController {
         Store store1 = storeService.registerStore(accountId, registerStoreDto);
         Schedule schedule = scheduleService.createSchedule(store1);
         Store store = storeService.setSchedule(store1, schedule);
-
+        log.info("신규 매장 등록: store={}", store);
         log.info("registerStore() end");
         return ResponseEntity.ok(store);
     }

@@ -91,7 +91,7 @@ public class StoreService {
                 .address(address)
                 .schedule(null)
                 .build();
-        log.info("신규 매장 등록: store={}", newStore);
+
         storeRepository.save(newStore);
         storeAccountRepository.save(StoreAccount.builder()
                 .store(newStore)
