@@ -40,11 +40,20 @@ public class StoreService {
      * @param storeId 매장 ID
      * @param account 계정 정보
      */
-    private static void checkPermission(long storeId, Account account) {
+    private void checkPermission(long storeId, Account account) {
         List<String> authoritiesToString = account.getAuthoritiesToString();
         if (!(authoritiesToString.contains("STORE_" + storeId + "_ROLE_OWNER") ||
                 authoritiesToString.contains("STORE_" + storeId + "_ROLE_MANAGER")))
             throw new CustomException(ErrorCode.ROLE_ACCESS_DENIED);
+    }
+
+    public boolean checkPermission(long storeId, long accountId) {
+        try {
+            checkPermission(storeId, accountService.findAccount(accountId));
+            return true;
+        } catch (CustomException e) {
+            return false;
+        }
     }
 
     /**
@@ -69,6 +78,11 @@ public class StoreService {
                 .build();
         log.info("신규 매장 등록: store={}", newStore);
         storeRepository.save(newStore);
+        storeAccountRepository.save(StoreAccount.builder()
+                .store(newStore)
+                .account(account)
+                .role(Role.OWNER)
+                .build());
 
         return newStore;
     }
@@ -142,6 +156,11 @@ public class StoreService {
 
         store.addEmployee(account);
         storeRepository.save(store);
+        storeAccountRepository.save(StoreAccount.builder()
+                .store(store)
+                .account(account)
+                .role(Role.EMPLOYEE)
+                .build());
         log.info("직원 등록: accountId={}, storeId={}", accountId, storeId);
         return storeId;
     }
@@ -165,6 +184,7 @@ public class StoreService {
 
         store.removeAccount(account);
         storeRepository.save(store);
+        storeAccountRepository.findByStoreIdAndAccountId(storeId, accountId).ifPresent(storeAccountRepository::delete);
         log.info("직원 삭제: accountId={}, storeId={}", accountId, storeId);
     }
 

@@ -300,4 +300,14 @@ public class StoreController {
         return ResponseEntity.ok(allByAccountId);
     }
 
+    @Operation(summary = "권한 확인",
+            description = "사용자가 매장에 대한 권한을 가지고 있는지 확인합니다.",
+            tags = {"store"})
+    @GetMapping("/check-permission")
+    public ResponseEntity<?> checkPermission(@RequestParam("storeId") long storeId) {
+        long accountId = JwtTokenProvider.getAccountIdFromSecurity();
+        boolean hasPermission = storeService.checkPermission(storeId, accountId);
+        return ResponseEntity.ok(hasPermission);
+    }
+
 }
