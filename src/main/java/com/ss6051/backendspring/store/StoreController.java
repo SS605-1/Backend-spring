@@ -5,6 +5,7 @@ import com.ss6051.backendspring.schedule.common.ScheduleService;
 import com.ss6051.backendspring.schedule.common.domain.Schedule;
 import com.ss6051.backendspring.store.domain.Store;
 import com.ss6051.backendspring.store.dto.RegisterStoreDto;
+import com.ss6051.backendspring.store.dto.StoreNameAddrDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
@@ -15,6 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -284,19 +286,19 @@ public class StoreController {
 
     @Operation(summary = "매장 조회",
             description = "사용자가 등록된 모든 매장을 조회합니다. (jwt 토큰 값에서 사용자 id를 파싱해서 조회)",
-            tags = {"store"},
-            responses = {
-                    @ApiResponse(responseCode = "200", description = "매장 조회 성공",
-                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = List.class),
-                                    examples = {
-                                            @ExampleObject(value = """
-                                                    [백채김치찌개 성신여대입구역점, CU 성북정릉점]""")
-                                    }))
-            })
+            tags = {"store"})
     @GetMapping("/user")
-    public ResponseEntity<?> getAllAssignedStores() {
+    public ResponseEntity<List<StoreNameAddrDTO>> getAllAssignedStores() {
         long accountId = JwtTokenProvider.getAccountIdFromSecurity();
-        return ResponseEntity.ok(storeService.findAllStoreNameByAccountId(accountId));
+        List<Long> allByAccountId = storeService.findAllByAccountId(accountId);
+        List<StoreNameAddrDTO> result = new ArrayList<>();
+        allByAccountId.forEach(id -> {
+            Store store = storeService.findStore(id);
+            result.add(
+                    new StoreNameAddrDTO(store.getId(), store.getName(), store.getAddress().getStreetAddress(), store.getAddress().getLotNumberAddress())
+            );
+        });
+        return ResponseEntity.ok(result);
     }
 
     @Operation(summary = "권한 확인",
