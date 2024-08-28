@@ -12,8 +12,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
+
+import static com.ss6051.backendspring.schedule.actual.domain.LaborLawConstant.NIGHT_SHIFT_END_HOUR;
+import static com.ss6051.backendspring.schedule.actual.domain.LaborLawConstant.NIGHT_SHIFT_START_HOUR;
 
 @Service
 @Slf4j
@@ -63,28 +67,100 @@ public class ActualWorkScheduleService {
         actualWorkScheduleRepository.deleteById(dto.id());
     }
 
+    public List<ActualWorkSchedule> getTargetSchedule(ActualWorkTimeRequestDTO dto) {
+        ScheduleAccountPair pair = scheduleService.getScheduleAndAccount(dto.storeId(), dto.accountId());
+        return actualWorkScheduleRepository.findAllByScheduleAndAccountAndStartDateTimeBetween(pair.schedule(), pair.account(), dto.startDateTime(), dto.endDateTime());
+    }
+
     /**
      * 사용자의 특정 기간 동안의 실제 근무 시간 합을 분 단위로 조회한다.
-     * 시작일부터 종료일 사이에 기록된 실제 근무 시간이 조회 대상이며, 기준 시각은 dto 입력으로 받는다..
+     * 근무 시간은 0분/30분 중 더 가까운 값으로 조정한다.
+     * 시작일부터 종료일 사이에 시작한 것으로 기록된 실제 근무 시간이 조회 대상이다.
      *
      * @param dto
      * @return
      */
     @Transactional(readOnly = true)
-    public Long getActualWorkTimeInPeriodOfUser(ActualWorkTimeRequestDTO dto) {
-        ScheduleAccountPair pair = scheduleService.getScheduleAndAccount(dto.storeId(), dto.accountId());
-        List<ActualWorkSchedule> allByScheduleAndAccount = actualWorkScheduleRepository.findAllByScheduleAndAccount(pair.schedule(), pair.account());
+    public WorkTimeResultDto getActualWorkTimeInPeriodOfUser(ActualWorkTimeRequestDTO dto) {
+        List<ActualWorkSchedule> allByScheduleAndAccount = getTargetSchedule(dto);
 
-        Long result = 0L;
+        long dayWorkMinute = 0;
+        long nightWorkMinute = 0;
+        int workDayCount = 0;
+
         for (ActualWorkSchedule schedule : allByScheduleAndAccount) {
-            LocalDateTime start = schedule.getStartDateTime();
-            LocalDateTime end = schedule.getEndDateTime();
-            LocalDateTime startCriteria = dto.startDate().atStartOfDay().plusHours(dto.criteriaHour());
-            LocalDateTime endCriteria = dto.endDate().atStartOfDay().plusHours(dto.criteriaHour());
-            if (!start.isBefore(startCriteria) && !end.isAfter(endCriteria)) {
-                result += schedule.getActualWorkTimeMinute();
+            workDayCount += 1; // 기간 동안 근무한 날 수
+            LocalDateTime startDateTime = adjustWorkTime(schedule.getStartDateTime());
+            LocalDateTime endDateTime = adjustWorkTime(schedule.getEndDateTime());
+
+            dayWorkMinute += Duration.between(startDateTime, endDateTime).toMinutes();
+
+            // 야간 수당 계산 조건에 해당하는가?
+            if (dto.hasMoreThanFiveEmployees()) {
+                // 야간 근무 시간대; var1-: 시작일 0~6시, var2-: 시작일 22~24시, var3-: 종료일 0~6시, var4-: 종료일 22~24시
+                final LocalDateTime var1s = startDateTime.toLocalDate().atStartOfDay();
+                final LocalDateTime var1e = startDateTime.toLocalDate().atStartOfDay().plusHours(NIGHT_SHIFT_END_HOUR.getValue());
+
+                final LocalDateTime var2s = startDateTime.toLocalDate().atStartOfDay().plusHours(NIGHT_SHIFT_START_HOUR.getValue());
+                final LocalDateTime var2e = startDateTime.toLocalDate().atStartOfDay().plusDays(1);
+
+                // 시작일과 종료일이 같은 날이면 중복 계산 방지
+                if (startDateTime.toLocalDate().atStartOfDay().equals(endDateTime.toLocalDate().atStartOfDay())) {
+                    final LocalDateTime[] starts = {var1s, var2s};
+                    final LocalDateTime[] ends = {var1e, var2e};
+
+                    for (int i = 0; i < 2; i++) {
+                        Duration overlap = calculateOverlap(startDateTime, endDateTime, starts[i], ends[i]);
+                        nightWorkMinute += overlap.toMinutes();
+                    }
+                } else {
+                    final LocalDateTime var3s = endDateTime.toLocalDate().atStartOfDay();
+                    final LocalDateTime var3e = endDateTime.toLocalDate().atStartOfDay().plusHours(NIGHT_SHIFT_END_HOUR.getValue());
+
+                    final LocalDateTime var4s = endDateTime.toLocalDate().atStartOfDay().plusHours(NIGHT_SHIFT_START_HOUR.getValue());
+                    final LocalDateTime var4e = endDateTime.toLocalDate().atStartOfDay().plusDays(1);
+
+                    final LocalDateTime[] starts = {var1s, var2s, var3s, var4s};
+                    final LocalDateTime[] ends = {var1e, var2e, var3e, var4e};
+
+                    for (int i = 0; i < 4; i++) {
+                        Duration overlap = calculateOverlap(startDateTime, endDateTime, starts[i], ends[i]);
+                        nightWorkMinute += overlap.toMinutes();
+                    }
+                }
             }
+
+            // 야간 근무 시간으로 계산된 부분은 주간 근무 시간에서 제외
+            dayWorkMinute -= nightWorkMinute;
+
         }
-        return result;
+        return new WorkTimeResultDto(dayWorkMinute, nightWorkMinute, workDayCount);
+    }
+
+    private LocalDateTime adjustWorkTime(LocalDateTime dateTime) {
+
+        int minute = dateTime.getMinute();
+        if (minute < 15) {
+            dateTime = dateTime.withMinute(0);
+        } else if (minute < 45) {
+            dateTime = dateTime.withMinute(30);
+        } else {
+            dateTime = dateTime.withMinute(0).plusHours(1);
+        }
+
+        return dateTime;
+    }
+
+
+    private Duration calculateOverlap(LocalDateTime startDateTime, LocalDateTime endDateTime,
+                                      LocalDateTime rangeStart, LocalDateTime rangeEnd) {
+        LocalDateTime overlapStart = startDateTime.isAfter(rangeStart) ? startDateTime : rangeStart;
+        LocalDateTime overlapEnd = endDateTime.isBefore(rangeEnd) ? endDateTime : rangeEnd;
+
+        if (overlapStart.isBefore(overlapEnd)) {
+            return Duration.between(overlapStart, overlapEnd);
+        } else {
+            return Duration.ZERO;
+        }
     }
 }

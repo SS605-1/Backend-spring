@@ -6,11 +6,19 @@ import com.ss6051.backendspring.schedule.common.domain.Schedule;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
 public interface ActualWorkScheduleRepository extends JpaRepository<ActualWorkSchedule, Long> {
     List<ActualWorkSchedule> findAllBySchedule(Schedule schedule);
     List<ActualWorkSchedule> findAllByScheduleAndAccount(Schedule schedule, Account account);
+
+    List<ActualWorkSchedule> findAllByScheduleAndAccountAndStartDateTimeBetween(
+            Schedule schedule,
+            Account account,
+            LocalDateTime startDateTimeStart,
+            LocalDateTime startDateTimeEnd
+    );
 
 }

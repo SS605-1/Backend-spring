@@ -1,10 +1,10 @@
 package com.ss6051.backendspring.schedule.actual.dto;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 public record ActualWorkTimeRequestDTO(long storeId,
                                        long accountId,
-                                       LocalDate startDate,
-                                       LocalDate endDate,
-                                       int criteriaHour) {
+                                       boolean hasMoreThanFiveEmployees,
+                                       LocalDateTime startDateTime,
+                                       LocalDateTime endDateTime) {
 }

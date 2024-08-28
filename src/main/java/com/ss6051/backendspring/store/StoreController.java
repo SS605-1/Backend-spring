@@ -276,6 +276,12 @@ public class StoreController {
         return ResponseEntity.ok().build();
     }
 
+    @Operation(summary = "기본급 조회",
+            description = "직원의 기본급을 조회합니다.",
+            tags = {"store"},
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "기본급 조회 성공"),
+            })
     @GetMapping("/salary")
     public ResponseEntity<?> getBaseSalary(@RequestParam("employeeId") long employeeId) {
         long accountId = JwtTokenProvider.getAccountIdFromSecurity();

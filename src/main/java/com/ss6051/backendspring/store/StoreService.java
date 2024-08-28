@@ -263,7 +263,7 @@ public class StoreService {
     }
 
     @Transactional(readOnly = true)
-    protected StoreAccount getAccount(Long accountId, long storeId) {
+    public StoreAccount getAccount(Long accountId, long storeId) {
         Account account = accountService.findAccount(accountId);
         findStore(storeId);
         checkPermission(storeId, account);
@@ -290,4 +290,12 @@ public class StoreService {
         return allByAccountId.stream().map(storeAccount ->
                 storeAccount.getStore().getName()).toList();
     }
+
+    /*
+    --------------------------------------------
+        시급 계산 관련
+    --------------------------------------------
+     */
+
+
 }

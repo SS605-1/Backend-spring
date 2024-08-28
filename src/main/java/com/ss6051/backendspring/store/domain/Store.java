@@ -101,4 +101,8 @@ public class Store {
                 )
         );
     }
+
+    public long getEmployeeCount() {
+        return employeeList.size();
+    }
 }
