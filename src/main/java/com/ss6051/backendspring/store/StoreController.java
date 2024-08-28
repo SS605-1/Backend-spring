@@ -255,16 +255,18 @@ public class StoreController {
             responses = {
                     @ApiResponse(responseCode = "200", description = "기본급 설정 성공"),
             })
-    @PostMapping("/set-salary")
+    @PostMapping("/salary")
     public ResponseEntity<?> setBaseSalary(@RequestParam("employeeId") long employeeId, @RequestParam("salary") long salary) {
-        log.info("setSalary() start");
-
         long accountId = JwtTokenProvider.getAccountIdFromSecurity();
-
         storeService.setBaseSalary(accountId, employeeId, salary);
-
-        log.info("setSalary() end");
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/salary")
+    public ResponseEntity<?> getBaseSalary(@RequestParam("employeeId") long employeeId) {
+        long accountId = JwtTokenProvider.getAccountIdFromSecurity();
+        long salary = storeService.getBaseSalary(accountId, employeeId);
+        return ResponseEntity.ok(salary);
     }
 
     @Operation(summary = "매장 조회",

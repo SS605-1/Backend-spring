@@ -251,6 +251,12 @@ public class StoreService {
     }
 
     @Transactional(readOnly = true)
+    public Long getBaseSalary(Long accountId, long storeId) {
+        StoreAccount storeAccount = getAccount(accountId, storeId);
+        return storeAccount.getBaseSalary();
+    }
+
+    @Transactional(readOnly = true)
     protected StoreAccount getAccount(Long accountId, long storeId) {
         Account account = accountService.findAccount(accountId);
         findStore(storeId);
