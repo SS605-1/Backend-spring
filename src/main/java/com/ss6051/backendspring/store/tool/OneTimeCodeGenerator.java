@@ -20,6 +20,7 @@ public class OneTimeCodeGenerator {
 
     private final Set<String> usedCodes = new HashSet<>();
     private final Map<String, Long> codeToStoreMap = new HashMap<>();
+    private final Map<Long, String> StoreToCodeMap = new HashMap<>();
     private final SecureRandom random = new SecureRandom();
 
     /**
@@ -29,12 +30,18 @@ public class OneTimeCodeGenerator {
      */
     public String generateUniqueCode(Long storeId) {
         String code;
+        if (StoreToCodeMap.containsKey(storeId)) {
+            code = StoreToCodeMap.get(storeId);
+            log.info("One-time code already exists for store {}: {}", storeId, code);
+            return code;
+        }
         do {
             code = generateRandomCode();
         } while (usedCodes.contains(code));
 
         usedCodes.add(code);
         codeToStoreMap.put(code, storeId);
+        StoreToCodeMap.put(storeId, code);
         scheduleExpiration(code);
 
         log.info("Generated one-time code for store {}: {}", storeId, code);
@@ -74,6 +81,7 @@ public class OneTimeCodeGenerator {
             @Override
             public void run() {
                 usedCodes.remove(code);
+                StoreToCodeMap.remove(codeToStoreMap.get(code));
                 codeToStoreMap.remove(code);
                 log.info("One-time code expired: {}", code);
             }
