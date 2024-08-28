@@ -231,6 +231,12 @@ public class StoreService {
 
     }
 
+    @Transactional(readOnly = true)
+    public List<Account> getAllAccounts(Long storeId) {
+        Store store = findStore(storeId);
+        return store.getAllAccounts();
+    }
+
     /**
      * 기본급 변경
      *

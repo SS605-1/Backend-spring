@@ -1,5 +1,6 @@
 package com.ss6051.backendspring.store;
 
+import com.ss6051.backendspring.global.domain.Account;
 import com.ss6051.backendspring.global.tool.JwtTokenProvider;
 import com.ss6051.backendspring.schedule.common.ScheduleService;
 import com.ss6051.backendspring.schedule.common.domain.Schedule;
@@ -221,6 +222,19 @@ public class StoreController {
 
         log.info("deleteEmployee() end");
         return ResponseEntity.ok().build();
+    }
+
+    @Operation(summary = "매장 전체 직원 조회",
+            description = "매장에 속한 모든 직원을 조회합니다.",
+            tags = {"store"},
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "매장 삭제 성공")
+            })
+    @GetMapping("/user/accounts")
+    public ResponseEntity<List<Account>> getAllAccounts() {
+        long accountId = JwtTokenProvider.getAccountIdFromSecurity();
+        List<Account> allAccounts = storeService.getAllAccounts(accountId);
+        return ResponseEntity.ok(allAccounts);
     }
 
 
