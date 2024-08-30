@@ -1,6 +1,7 @@
 package com.ss6051.backendspring.schedule.actual;
 
 import com.ss6051.backendspring.global.exception.CustomException;
+import com.ss6051.backendspring.global.tool.JwtTokenProvider;
 import com.ss6051.backendspring.schedule.actual.domain.ActualWorkSchedule;
 import com.ss6051.backendspring.schedule.actual.dto.*;
 import io.swagger.v3.oas.annotations.Operation;
@@ -34,9 +35,10 @@ public class ActualWorkScheduleController {
     public ResponseEntity<Long> createActualWorkSchedule(@RequestBody ActualWorkCreationDTO dto) {
         log.info("createActualWorkSchedule");
 
+        long accountId = JwtTokenProvider.getAccountIdFromSecurity();
         Long id = null;
         try {
-            id = actualWorkScheduleService.createActualWorkSchedule(dto);
+            id = actualWorkScheduleService.createActualWorkSchedule(dto, accountId);
         } catch (CustomException e) {
             log.error(e.getMessage());
         }
@@ -73,9 +75,10 @@ public class ActualWorkScheduleController {
     public ResponseEntity<List<ActualWorkSchedule>> findAllActualWorkScheduleByStoreIdAndAccountId(@RequestBody ActualWorkReadStoreAccountAllDTO dto) {
         log.info("findAllActualWorkScheduleByStoreIdAndAccountId");
 
+        long accountId = JwtTokenProvider.getAccountIdFromSecurity();
         List<ActualWorkSchedule> schedules = null;
         try {
-            schedules = actualWorkScheduleService.findAllActualWorkScheduleByStoreIdAndAccountId(dto);
+            schedules = actualWorkScheduleService.findAllActualWorkScheduleByStoreIdAndAccountId(dto, accountId);
         } catch (CustomException e) {
             log.error(e.getMessage());
         }
@@ -172,10 +175,10 @@ public class ActualWorkScheduleController {
     @GetMapping("/worktime")
     public ResponseEntity<WorkTimeResultDto> getActualWorkTimeInPeriodOfUser(@RequestBody ActualWorkTimeRequestDTO dto) {
         log.info("getActualWorkTimeInPeriodOfUser");
-
+        long accountId = JwtTokenProvider.getAccountIdFromSecurity();
         WorkTimeResultDto actualWorkTime = null;
         try {
-            actualWorkTime = actualWorkScheduleService.getActualWorkTimeInPeriodOfUser(dto);
+            actualWorkTime = actualWorkScheduleService.getActualWorkTimeInPeriodOfUser(dto, accountId);
         } catch (CustomException e) {
             log.error(e.getMessage());
         }

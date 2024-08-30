@@ -28,8 +28,8 @@ public class ActualWorkScheduleService {
     private final ScheduleService scheduleService;
 
     @Transactional
-    public Long createActualWorkSchedule(ActualWorkCreationDTO dto) {
-        ScheduleAccountPair pair = scheduleService.getScheduleAndAccount(dto.storeId(), dto.accountId());
+    public Long createActualWorkSchedule(ActualWorkCreationDTO dto, long accountId) {
+        ScheduleAccountPair pair = scheduleService.getScheduleAndAccount(dto.storeId(), accountId);
 
         ActualWorkSchedule schedule = ActualWorkSchedule.builder()
                 .account(pair.account())
@@ -48,8 +48,8 @@ public class ActualWorkScheduleService {
     }
 
     @Transactional(readOnly = true)
-    public List<ActualWorkSchedule> findAllActualWorkScheduleByStoreIdAndAccountId(ActualWorkReadStoreAccountAllDTO dto) {
-        ScheduleAccountPair pair = scheduleService.getScheduleAndAccount(dto.storeId(), dto.accountId());
+    public List<ActualWorkSchedule> findAllActualWorkScheduleByStoreIdAndAccountId(ActualWorkReadStoreAccountAllDTO dto, long accountId) {
+        ScheduleAccountPair pair = scheduleService.getScheduleAndAccount(dto.storeId(), accountId);
         return actualWorkScheduleRepository.findAllByScheduleAndAccount(pair.schedule(), pair.account());
     }
 
@@ -71,8 +71,8 @@ public class ActualWorkScheduleService {
         actualWorkScheduleRepository.deleteById(dto.id());
     }
 
-    public List<ActualWorkSchedule> getTargetSchedule(ActualWorkTimeRequestDTO dto) {
-        ScheduleAccountPair pair = scheduleService.getScheduleAndAccount(dto.storeId(), dto.accountId());
+    public List<ActualWorkSchedule> getTargetSchedule(ActualWorkTimeRequestDTO dto, long accountId) {
+        ScheduleAccountPair pair = scheduleService.getScheduleAndAccount(dto.storeId(), accountId);
         return actualWorkScheduleRepository.findAllByScheduleAndAccountAndStartDateTimeBetween(pair.schedule(), pair.account(), dto.startDateTime(), dto.endDateTime());
     }
 
@@ -82,11 +82,12 @@ public class ActualWorkScheduleService {
      * 시작일부터 종료일 사이에 시작한 것으로 기록된 실제 근무 시간이 조회 대상이다.
      *
      * @param dto
+     * @param accountId
      * @return
      */
     @Transactional(readOnly = true)
-    public WorkTimeResultDto getActualWorkTimeInPeriodOfUser(ActualWorkTimeRequestDTO dto) {
-        List<ActualWorkSchedule> allByScheduleAndAccount = getTargetSchedule(dto);
+    public WorkTimeResultDto getActualWorkTimeInPeriodOfUser(ActualWorkTimeRequestDTO dto, long accountId) {
+        List<ActualWorkSchedule> allByScheduleAndAccount = getTargetSchedule(dto, accountId);
 
         long dayWorkMinute = 0;
         long nightWorkMinute = 0;

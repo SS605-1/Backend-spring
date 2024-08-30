@@ -55,8 +55,8 @@ public class SalaryService {
                 });
 
         for (LocalDate[] week : weeks) {
-            WorkTimeResultDto result = actualWorkScheduleService.getActualWorkTimeInPeriodOfUser(
-                    new ActualWorkTimeRequestDTO(storeId, accountId, hasMoreThanFiveEmployees, week[0].atStartOfDay(), week[1].atStartOfDay()));
+            final ActualWorkTimeRequestDTO dto = new ActualWorkTimeRequestDTO(storeId, hasMoreThanFiveEmployees, week[0].atStartOfDay(), week[1].atStartOfDay());
+            WorkTimeResultDto result = actualWorkScheduleService.getActualWorkTimeInPeriodOfUser(dto, accountId);
             totalDayWorkMins += result.dayShiftMinute();
             totalNightWorkMins += result.nightShiftMinute();
 
