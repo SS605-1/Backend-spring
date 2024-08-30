@@ -53,6 +53,7 @@ public class SecurityConfig {
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
+        source.registerCorsConfiguration("/h2-console/**", configuration); // H2 콘솔 경로에 CORS 허용
         return source;
     }
 }
