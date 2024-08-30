@@ -31,7 +31,7 @@ public class ActualWorkScheduleController {
             }
     )
     @PostMapping("")
-    public ResponseEntity<?> createActualWorkSchedule(@RequestBody ActualWorkCreationDTO dto) {
+    public ResponseEntity<Long> createActualWorkSchedule(@RequestBody ActualWorkCreationDTO dto) {
         log.info("createActualWorkSchedule");
 
         Long id = null;
@@ -70,7 +70,7 @@ public class ActualWorkScheduleController {
             }
     )
     @GetMapping("/store-and-account")
-    public ResponseEntity<?> findAllActualWorkScheduleByStoreIdAndAccountId(@RequestBody ActualWorkReadStoreAccountAllDTO dto) {
+    public ResponseEntity<List<ActualWorkSchedule>> findAllActualWorkScheduleByStoreIdAndAccountId(@RequestBody ActualWorkReadStoreAccountAllDTO dto) {
         log.info("findAllActualWorkScheduleByStoreIdAndAccountId");
 
         List<ActualWorkSchedule> schedules = null;
@@ -110,7 +110,7 @@ public class ActualWorkScheduleController {
             }
     )
     @GetMapping("/store")
-    public ResponseEntity<?> findAllActualWorkScheduleByStoreId(@RequestBody ActualWorkReadStoreAllDTO dto) {
+    public ResponseEntity<List<ActualWorkSchedule>> findAllActualWorkScheduleByStoreId(@RequestBody ActualWorkReadStoreAllDTO dto) {
         log.info("findAllActualWorkScheduleByStoreId");
         List<ActualWorkSchedule> schedules = null;
         try {
@@ -123,7 +123,7 @@ public class ActualWorkScheduleController {
     }
 
     @Operation(summary = "특정 직원의 실제 근무 스케줄 수정",
-            description = "특정 직원의 실제 근무 스케줄을 수정합니다. 출퇴근 기록 작성에도 사용 가능합니다.",
+            description = "특정 직원의 실제 근무 스케줄을 수정합니다. 출퇴근 기록 작성에도 사용 가능합니다. 시작 시간을 명시하지 않으면 종료 시간만 수정됩니다.",
             tags = {"schedule"},
             responses = {
                     @ApiResponse(responseCode = "200", description = "실제 근무 스케줄 조회 성공",
@@ -131,7 +131,7 @@ public class ActualWorkScheduleController {
             }
     )
     @PatchMapping("")
-    public ResponseEntity<?> updateActualWorkSchedule(@RequestBody ActualWorkUpdateDTO dto) {
+    public ResponseEntity<ActualWorkSchedule> updateActualWorkSchedule(@RequestBody ActualWorkUpdateDTO dto) {
         log.info("updateActualWorkSchedule");
 
         ActualWorkSchedule schedule = null;
@@ -170,7 +170,7 @@ public class ActualWorkScheduleController {
     )
     @Deprecated
     @GetMapping("/worktime")
-    public ResponseEntity<?> getActualWorkTimeInPeriodOfUser(@RequestBody ActualWorkTimeRequestDTO dto) {
+    public ResponseEntity<WorkTimeResultDto> getActualWorkTimeInPeriodOfUser(@RequestBody ActualWorkTimeRequestDTO dto) {
         log.info("getActualWorkTimeInPeriodOfUser");
 
         WorkTimeResultDto actualWorkTime = null;

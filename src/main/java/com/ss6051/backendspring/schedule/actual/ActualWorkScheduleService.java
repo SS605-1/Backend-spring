@@ -58,7 +58,11 @@ public class ActualWorkScheduleService {
         ActualWorkSchedule schedule = actualWorkScheduleRepository.findById(dto.id())
                 .orElseThrow(() -> new CustomException(ErrorCode.ACTUAL_WORK_SCHEDULE_NOT_FOUND));
 
-        schedule.update(dto.updateDto().startDateTime(), dto.updateDto().endDateTime());
+        if (dto.updateDto().startDateTime() == null) {
+            schedule.updateEnd(dto.updateDto().endDateTime());
+        } else {
+            schedule.update(dto.updateDto().startDateTime(), dto.updateDto().endDateTime());
+        }
         return actualWorkScheduleRepository.save(schedule);
     }
 

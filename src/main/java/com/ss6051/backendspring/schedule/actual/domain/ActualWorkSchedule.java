@@ -39,5 +39,9 @@ public class ActualWorkSchedule {
         this.endDateTime = endDateTime;
     }
 
+    public void updateEnd(LocalDateTime endDateTime) {
+        this.endDateTime = endDateTime;
+    }
+
 }
 
