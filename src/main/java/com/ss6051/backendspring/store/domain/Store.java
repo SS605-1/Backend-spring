@@ -1,5 +1,6 @@
 package com.ss6051.backendspring.store.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.ss6051.backendspring.global.domain.Account;
 import com.ss6051.backendspring.global.domain.Role;
 import com.ss6051.backendspring.schedule.common.domain.Schedule;
@@ -24,14 +25,17 @@ public class Store {
     private String name;
 
     @ManyToOne
+    @JsonIgnore
     private Account owner; // 사장
 
     @OneToMany(mappedBy = "store")
     @Builder.Default
+    @JsonIgnore
     private List<StoreAccount> managerList = new ArrayList<>(); // 직원 목록
 
     @OneToMany(mappedBy = "store")
     @Builder.Default
+    @JsonIgnore
     private List<StoreAccount> employeeList = new ArrayList<>(); // 직원 목록
 
     @OneToOne(cascade = CascadeType.REMOVE, orphanRemoval = true)
@@ -39,6 +43,7 @@ public class Store {
 
     @Setter
     @OneToOne(mappedBy = "store", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    @JsonIgnore
     private Schedule schedule;
 
     /**
