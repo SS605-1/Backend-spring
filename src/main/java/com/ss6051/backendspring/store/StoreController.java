@@ -70,7 +70,7 @@ public class StoreController {
                                                     }""")}))
             })
     @PostMapping("/register")
-    public ResponseEntity<?> registerStore(@RequestBody RegisterStoreDto registerStoreDto) {
+    public ResponseEntity<Store> registerStore(@RequestBody RegisterStoreDto registerStoreDto) {
         log.info("registerStore() start");
 
         long accountId = JwtTokenProvider.getAccountIdFromSecurity();
@@ -144,7 +144,7 @@ public class StoreController {
                                                     }""")}))
             })
     @PostMapping("/find")
-    public ResponseEntity<?> findStore(@RequestParam("storeId") long storeId) {
+    public ResponseEntity<Store> findStore(@RequestParam("storeId") long storeId) {
         log.info("findStore() start");
         Store store = storeService.findStore(storeId);
         log.info("findStore() end");
@@ -195,7 +195,7 @@ public class StoreController {
                     @ApiResponse(responseCode = "200", description = "직원 등록 성공")
             })
     @PostMapping("/registerEmployee")
-    public ResponseEntity<?> registerEmployee(@RequestParam("code") String code) {
+    public ResponseEntity<Long> registerEmployee(@RequestParam("code") String code) {
         log.info("registerEmployee() start");
         // 쿠키의 accountId 값으로 매장 ID를 조회해야 하므로 파라미터로 쿠키의 회원 아이디 넘기기
         long accountId = JwtTokenProvider.getAccountIdFromSecurity();
@@ -283,7 +283,7 @@ public class StoreController {
                     @ApiResponse(responseCode = "200", description = "기본급 조회 성공"),
             })
     @GetMapping("/salary")
-    public ResponseEntity<?> getBaseSalary(@RequestParam("employeeId") long employeeId) {
+    public ResponseEntity<Long> getBaseSalary(@RequestParam("employeeId") long employeeId) {
         long accountId = JwtTokenProvider.getAccountIdFromSecurity();
         long salary = storeService.getBaseSalary(accountId, employeeId);
         return ResponseEntity.ok(salary);
@@ -301,7 +301,7 @@ public class StoreController {
                                     }))
             })
     @GetMapping("/user/{accountId}")
-    public ResponseEntity<?> getAllAssignedStores(@PathVariable long accountId) {
+    public ResponseEntity<List<Long>> getAllAssignedStores(@PathVariable long accountId) {
         List<Long> allByAccountId = storeService.findAllByAccountId(accountId);
         return ResponseEntity.ok(allByAccountId);
     }
@@ -327,7 +327,7 @@ public class StoreController {
             description = "사용자가 매장에 대한 권한을 가지고 있는지 확인합니다.",
             tags = {"store"})
     @GetMapping("/check-permission")
-    public ResponseEntity<?> checkPermission(@RequestParam("storeId") long storeId) {
+    public ResponseEntity<Boolean> checkPermission(@RequestParam("storeId") long storeId) {
         long accountId = JwtTokenProvider.getAccountIdFromSecurity();
         boolean hasPermission = storeService.checkPermission(storeId, accountId);
         return ResponseEntity.ok(hasPermission);

@@ -15,6 +15,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/schedule/basic")
 @Slf4j
@@ -50,7 +52,7 @@ public class BasicWorkScheduleController {
     )
     @PostMapping("")
     @Deprecated
-    public ResponseEntity<?> createBasicWorkSchedule(@RequestBody BasicWorkCreationDTO dto) {
+    public ResponseEntity<List<BasicWorkSchedule>> createBasicWorkSchedule(@RequestBody BasicWorkCreationDTO dto) {
         log.info("createBasicWorkSchedule");
         return ResponseEntity.ok(basicWorkScheduleService.createBasicWorkSchedule(dto));
     }
@@ -82,7 +84,7 @@ public class BasicWorkScheduleController {
             }
     )
     @GetMapping("")
-    public ResponseEntity<?> findAllBasicWorkScheduleByStoreId(@RequestBody BasicWorkReadDTO dto) {
+    public ResponseEntity<List<BasicWorkSchedule>> findAllBasicWorkScheduleByStoreId(@RequestBody BasicWorkReadDTO dto) {
         log.info("findAllBasicWorkScheduleByStoreId");
         return ResponseEntity.ok(basicWorkScheduleService.findAllBasicWorkSchedule(dto));
     }
@@ -96,7 +98,7 @@ public class BasicWorkScheduleController {
             }
     )
     @PatchMapping("")
-    public ResponseEntity<?> updateBasicWorkSchedule(@RequestBody BasicWorkUpdateDTO dto) {
+    public ResponseEntity<BasicWorkSchedule> updateBasicWorkSchedule(@RequestBody BasicWorkUpdateDTO dto) {
         log.info("updateBasicWorkSchedule");
         return ResponseEntity.ok(basicWorkScheduleService.updateBasicWorkSchedule(dto));
     }
