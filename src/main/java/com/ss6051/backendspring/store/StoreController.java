@@ -1,10 +1,10 @@
 package com.ss6051.backendspring.store;
 
-import com.ss6051.backendspring.global.domain.Account;
 import com.ss6051.backendspring.global.tool.JwtTokenProvider;
 import com.ss6051.backendspring.schedule.common.ScheduleService;
 import com.ss6051.backendspring.schedule.common.domain.Schedule;
 import com.ss6051.backendspring.store.domain.Store;
+import com.ss6051.backendspring.store.dto.AllAccountsRequestDTO;
 import com.ss6051.backendspring.store.dto.RegisterStoreDto;
 import com.ss6051.backendspring.store.dto.StoreNameAddrDTO;
 import io.swagger.v3.oas.annotations.Operation;
@@ -231,9 +231,9 @@ public class StoreController {
                     @ApiResponse(responseCode = "200", description = "직원 전체 조회 성공")
             })
     @GetMapping("/user/accounts")
-    public ResponseEntity<List<Account>> getAllAccounts(@RequestParam("storeId") long storeId) {
-        long accountId = JwtTokenProvider.getAccountIdFromSecurity();
-        List<Account> allAccounts = storeService.getAllAccounts(storeId);
+    public ResponseEntity<List<AllAccountsRequestDTO>> getAllAccounts(@RequestParam("storeId") long storeId) {
+        // long accountId = JwtTokenProvider.getAccountIdFromSecurity();
+        List<AllAccountsRequestDTO> allAccounts = storeService.getAllAccounts(storeId);
         return ResponseEntity.ok(allAccounts);
     }
 

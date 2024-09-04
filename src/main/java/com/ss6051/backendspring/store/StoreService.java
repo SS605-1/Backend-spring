@@ -10,6 +10,7 @@ import com.ss6051.backendspring.schedule.common.domain.Schedule;
 import com.ss6051.backendspring.store.domain.Address;
 import com.ss6051.backendspring.store.domain.Store;
 import com.ss6051.backendspring.store.domain.StoreAccount;
+import com.ss6051.backendspring.store.dto.AllAccountsRequestDTO;
 import com.ss6051.backendspring.store.dto.RegisterStoreDto;
 import com.ss6051.backendspring.store.repository.AddressRepository;
 import com.ss6051.backendspring.store.repository.StoreAccountRepository;
@@ -232,9 +233,13 @@ public class StoreService {
     }
 
     @Transactional(readOnly = true)
-    public List<Account> getAllAccounts(Long storeId) {
+    public List<AllAccountsRequestDTO> getAllAccounts(Long storeId) {
         Store store = findStore(storeId);
-        return store.getAllAccounts();
+        List<Account> allAccounts = store.getAllAccounts();
+
+        return allAccounts.stream()
+                .map(account -> new AllAccountsRequestDTO(account.getId(), account.getNickname()))
+                .toList();
     }
 
     /**
@@ -283,6 +288,7 @@ public class StoreService {
         return allByAccountId.stream().map(storeAccount ->
                 storeAccount.getStore().getId()).toList();
     }
+
     @Transactional(readOnly = true)
     public List<String> findAllStoreNameByAccountId(Long accountId) {
         List<StoreAccount> allByAccountId = storeAccountRepository.findAllByAccountId(accountId);
