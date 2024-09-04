@@ -228,12 +228,12 @@ public class StoreController {
             description = "매장에 속한 모든 직원을 조회합니다.",
             tags = {"store"},
             responses = {
-                    @ApiResponse(responseCode = "200", description = "매장 삭제 성공")
+                    @ApiResponse(responseCode = "200", description = "직원 전체 조회 성공")
             })
     @GetMapping("/user/accounts")
-    public ResponseEntity<List<Account>> getAllAccounts() {
+    public ResponseEntity<List<Account>> getAllAccounts(@RequestParam("storeId") long storeId) {
         long accountId = JwtTokenProvider.getAccountIdFromSecurity();
-        List<Account> allAccounts = storeService.getAllAccounts(accountId);
+        List<Account> allAccounts = storeService.getAllAccounts(storeId);
         return ResponseEntity.ok(allAccounts);
     }
 
