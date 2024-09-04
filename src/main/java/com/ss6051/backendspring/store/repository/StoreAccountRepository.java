@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface StoreAccountRepository extends JpaRepository<StoreAccount, StoreAccountId> {
+public interface StoreAccountRepository extends JpaRepository<StoreAccount, Long> {
     Optional<StoreAccount> findByStoreIdAndAccountId(Long storeId, Long accountId);
     List<StoreAccount> findAllByAccountId(Long accountId);
 }

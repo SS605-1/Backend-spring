@@ -1,6 +1,8 @@
 package com.ss6051.backendspring.schedule.common.domain;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.ss6051.backendspring.global.domain.Account;
 import com.ss6051.backendspring.schedule.actual.domain.ActualWorkSchedule;
 import com.ss6051.backendspring.schedule.basic.domain.BasicWorkSchedule;
@@ -16,6 +18,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
+@JsonIdentityInfo(generator = ObjectIdGenerators.IntSequenceGenerator.class, property = "id")
 public class Schedule {
 
     @Id

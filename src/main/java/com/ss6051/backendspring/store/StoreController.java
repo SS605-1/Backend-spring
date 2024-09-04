@@ -104,41 +104,18 @@ public class StoreController {
                                                         "street_address": "도로명주소",
                                                         "lot_number_address": "지번주소"
                                                       },
-                                                        "owner": {
-                                                            "id": 1,
-                                                            "nickname": "john_doe",
-                                                            "profile_image_url": "https://example.com/profile.jpg",
-                                                            "thumbnail_image_url": "https://example.com/thumbnail.jpg"
-                                                        },
+                                                        "owner": 1,
                                                       "managerList": [
                                                         {
-                                                          "account": {
-                                                            "id": 1,
-                                                            "nickname": "john_doe",
-                                                            "profile_image_url": "https://example.com/profile.jpg",
-                                                            "thumbnail_image_url": "https://example.com/thumbnail.jpg"
-                                                          },
-                                                          "role": "OWNER"
+                                                          "account": 1
                                                         },
                                                         {
-                                                          "account": {
-                                                            "id": 2,
-                                                            "nickname": "jane_doe",
-                                                            "profile_image_url": "https://example.com/profile.jpg",
-                                                            "thumbnail_image_url": "https://example.com/thumbnail.jpg"
-                                                          },
-                                                          "role": "MANAGER"
+                                                          "account": 2
                                                         }
                                                       ],
                                                       "employeeList": [
                                                         {
-                                                          "account": {
-                                                            "id": 3,
-                                                            "nickname": "another_doe",
-                                                            "profile_image_url": "https://example.com/profile.jpg",
-                                                            "thumbnail_image_url": "https://example.com/thumbnail.jpg"
-                                                          },
-                                                          "role": "EMPLOYEE"
+                                                          "account": 3
                                                         }
                                                       ]
                                                     }""")}))

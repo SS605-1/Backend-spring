@@ -1,5 +1,7 @@
 package com.ss6051.backendspring.global.domain;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.ss6051.backendspring.store.domain.StoreAccount;
 import jakarta.persistence.*;
 import lombok.*;
@@ -17,6 +19,7 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
+@JsonIdentityInfo(generator = ObjectIdGenerators.IntSequenceGenerator.class, property = "id")
 public class Account implements UserDetails {
 
     @Id

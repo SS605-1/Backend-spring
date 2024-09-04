@@ -1,5 +1,7 @@
 package com.ss6051.backendspring.store.domain;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.ss6051.backendspring.global.domain.Account;
 import com.ss6051.backendspring.global.domain.Role;
 import jakarta.persistence.*;
@@ -10,15 +12,17 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@IdClass(StoreAccountId.class)
+@JsonIdentityInfo(generator = ObjectIdGenerators.IntSequenceGenerator.class, property = "id")
 public class StoreAccount {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
     @ManyToOne
     @JoinColumn(name = "store_id")
     private Store store;
 
-    @Id
     @ManyToOne
     @JoinColumn(name = "account_id")
     private Account account;
