@@ -3,10 +3,12 @@ package com.ss6051.backendspring.global.logger;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
+import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.json.JSONObject;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -24,15 +26,15 @@ import java.util.Objects;
 public class LogAspect {
 
     // global 패키지 제외 모든 패키지에 대한 로그를 출력한다.
+
     @Pointcut("execution(* com.ss6051.backendspring..*.*(..)) && !execution(* com.ss6051.backendspring.global..*.*(..))")
     public void all() {
     }
-
     // 모든 패키지 내 서브패키지 controller 패키지에 대한 로그를 출력한다.
+
     @Pointcut("within(com.ss6051.backendspring..*Controller)")
     public void controller() {
     }
-
     @Around("all()")
     public Object log(ProceedingJoinPoint joinPoint) throws Throwable {
         long start = System.currentTimeMillis();
@@ -68,12 +70,23 @@ public class LogAspect {
         }
 
         log.info("[{}] {}", params.get("http_method"), params.get("request_uri"));
-        log.info("method: {}.{}", params.get("controller") ,params.get("method"));
+        log.info("method: {}.{}", params.get("controller"), params.get("method"));
         log.info("params: {}", params.get("params"));
         log.info("body: {}", params.get("body"));
 
         return joinPoint.proceed();
-}
+    }
+
+    @AfterReturning(pointcut = "controller()", returning = "response")
+    public void logResponseBody(Object response) {
+        if (response instanceof ResponseEntity<?> responseEntity) {
+            Object responseBody = responseEntity.getBody();
+
+            log.info("Response Body: {}", responseBody);
+        } else {
+            log.info("Response: {}", response);
+        }
+    }
 
     private static JSONObject getParams(HttpServletRequest request) {
         JSONObject jsonObject = new JSONObject();
