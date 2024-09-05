@@ -23,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 @Slf4j
 @Service
@@ -235,9 +236,9 @@ public class StoreService {
     @Transactional(readOnly = true)
     public List<AllAccountsRequestDTO> getAllAccounts(Long storeId) {
         Store store = findStore(storeId);
-        List<Account> allAccounts = store.getAllAccounts();
+        Stream<Account> allAccounts = store.getEmployeeList().stream().map(StoreAccount::getAccount);
 
-        return allAccounts.stream()
+        return allAccounts
                 .map(account -> new AllAccountsRequestDTO(account.getId(), account.getNickname()))
                 .toList();
     }
