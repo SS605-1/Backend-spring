@@ -6,6 +6,7 @@ import com.ss6051.backendspring.global.domain.Account;
 import com.ss6051.backendspring.global.domain.Role;
 import com.ss6051.backendspring.global.exception.CustomException;
 import com.ss6051.backendspring.global.exception.ErrorCode;
+import com.ss6051.backendspring.salary.dto.SalaryCalculateDTO;
 import com.ss6051.backendspring.schedule.common.domain.Schedule;
 import com.ss6051.backendspring.store.domain.Address;
 import com.ss6051.backendspring.store.domain.Store;
@@ -298,12 +299,6 @@ public class StoreService {
         return allByAccountId.stream().map(storeAccount ->
                 storeAccount.getStore().getName()).toList();
     }
-
-    /*
-    --------------------------------------------
-        시급 계산 관련
-    --------------------------------------------
-     */
 
 
 }

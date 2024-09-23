@@ -1,5 +1,7 @@
 package com.ss6051.backendspring.salary;
 
+import com.ss6051.backendspring.global.domain.Account;
+import com.ss6051.backendspring.salary.dto.SalaryCalculateDTO;
 import com.ss6051.backendspring.schedule.actual.ActualWorkScheduleService;
 import com.ss6051.backendspring.schedule.actual.dto.ActualWorkTimeRequestDTO;
 import com.ss6051.backendspring.schedule.actual.dto.WorkTimeResultDto;
@@ -94,5 +96,25 @@ public class SalaryService {
         return weeks;
     }
 
+        /*
+    --------------------------------------------
+        시급 계산 관련
+    --------------------------------------------
+     */
+
+
+    // 시급 계산. 매장 id를 받으면, 해당 매장의 모든 직원들의 전월과 당월 근무 시간을 가져오고, 해당 직원의 기본급을 가져와서 계산한다.
+    @Transactional(readOnly = true)
+    public List<SalaryCalculateDTO> calculateSalary(Long storeId) {
+        Store store = storeService.findStore(storeId);
+        List<StoreAccount> employeeList = store.getEmployeeList();
+        return employeeList.stream().map(storeAccount -> {
+            Account account = storeAccount.getAccount();
+            long accountId = account.getId();
+            long lastMonthSalary = calculateSalary(accountId, storeId, LocalDate.now().minusMonths(1).withDayOfMonth(1), LocalDate.now().minusMonths(1).withDayOfMonth(LocalDate.now().minusMonths(1).lengthOfMonth()));
+            long thisMonthSalary = calculateSalary(accountId, storeId, LocalDate.now().withDayOfMonth(1), LocalDate.now());
+            return new SalaryCalculateDTO(accountId, lastMonthSalary, thisMonthSalary);
+        }).toList();
+    }
 
 }
