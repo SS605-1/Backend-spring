@@ -1,14 +1,13 @@
 package com.ss6051.backendspring.schedule.common.domain;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.ss6051.backendspring.global.domain.Account;
 import com.ss6051.backendspring.schedule.actual.domain.ActualWorkSchedule;
 import com.ss6051.backendspring.schedule.basic.domain.BasicWorkSchedule;
-import com.ss6051.backendspring.store.domain.Store;
-import lombok.*;
 import jakarta.persistence.*;
+import lombok.*;
+
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -22,15 +21,7 @@ import java.util.List;
 public class Schedule {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id; // ID
-
-    @OneToOne
-    @Setter
-    @JoinColumn(name = "store_id")
-    @JsonIgnore
-    @ToString.Exclude
-    private Store store; // 가게 정보
 
     @OneToMany(mappedBy = "schedule", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<BasicWorkSchedule> basicWorkSchedules; // 기본 근무 일정

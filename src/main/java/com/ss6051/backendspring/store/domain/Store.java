@@ -40,10 +40,10 @@ public class Store {
 
     @OneToOne(cascade = CascadeType.REMOVE, orphanRemoval = true)
     private Address address;
-
-    @Setter
-    @OneToOne(mappedBy = "store", cascade = CascadeType.REMOVE, orphanRemoval = true)
-    private Schedule schedule;
+//
+//    @Setter
+//    @OneToOne(mappedBy = "store", cascade = CascadeType.REMOVE, orphanRemoval = true)
+//    private Schedule schedule;
 
     /**
      * 매장에 속한 모든 계정(사장, 관리자, 직원)을 조회한다.

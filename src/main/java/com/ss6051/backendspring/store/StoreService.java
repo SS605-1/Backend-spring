@@ -91,7 +91,7 @@ public class StoreService {
                 .owner(account)
                 .name(registerStoreDto.getStoreName())
                 .address(address)
-                .schedule(null)
+//                .schedule(null)
                 .build();
 
         storeRepository.save(newStore);
@@ -106,8 +106,9 @@ public class StoreService {
 
     @Transactional
     public Store setSchedule(Store newStore, Schedule schedule) {
-        newStore.setSchedule(schedule);
-        return storeRepository.save(newStore);
+        return newStore;
+//        newStore.setSchedule(schedule);
+//        return storeRepository.save(newStore);
     }
 
     /**

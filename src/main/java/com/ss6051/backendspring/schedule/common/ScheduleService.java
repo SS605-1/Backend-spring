@@ -7,7 +7,6 @@ import com.ss6051.backendspring.global.exception.ErrorCode;
 import com.ss6051.backendspring.global.validator.ExistsInDatabase;
 import com.ss6051.backendspring.schedule.common.domain.Schedule;
 import com.ss6051.backendspring.schedule.common.domain.ScheduleAccountPair;
-import com.ss6051.backendspring.store.StoreService;
 import com.ss6051.backendspring.store.domain.Store;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 @Service
 @Slf4j
@@ -23,13 +23,13 @@ public class ScheduleService {
 
     private final ScheduleRepository scheduleRepository;
 
-    private final StoreService storeService;
+//    private final StoreService storeService;
     private final AccountService accountService;
 
     @Transactional
     public Schedule createSchedule(Store store) {
         Schedule schedule = Schedule.builder()
-                .store(store)
+                .id(store.getId())
                 .lastModifiedBy(store.getOwner())
                 .lastModifiedTime(LocalDateTime.now())
                 .build();
@@ -48,11 +48,11 @@ public class ScheduleService {
     }
 
     public Schedule getSchedule(@ExistsInDatabase(type = Store.class) long storeId) {
-        Schedule schedule = storeService.findStore(storeId).getSchedule();
-        if (schedule == null) {
+        Optional<Schedule> schedule = scheduleRepository.findById(storeId);
+        if (schedule.isEmpty()) {
             throw new CustomException(ErrorCode.SCHEDULE_NOT_FOUND);
         }
-        return schedule;
+        return schedule.get();
 
     }
 
