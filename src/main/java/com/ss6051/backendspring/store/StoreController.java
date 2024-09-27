@@ -247,9 +247,8 @@ public class StoreController {
                     @ApiResponse(responseCode = "200", description = "기본급 설정 성공"),
             })
     @PostMapping("/salary")
-    public ResponseEntity<?> setBaseSalary(@RequestParam("employeeId") long employeeId, @RequestParam("salary") long salary) {
-        long accountId = JwtTokenProvider.getAccountIdFromSecurity();
-        storeService.setBaseSalary(accountId, employeeId, salary);
+    public ResponseEntity<?> setBaseSalary(@RequestParam("employeeId") long employeeId, @RequestParam("storeId") long storeId, @RequestParam("salary") long salary) {
+        storeService.setBaseSalary(employeeId, storeId, salary);
         return ResponseEntity.ok().build();
     }
 
